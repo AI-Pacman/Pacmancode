@@ -66,6 +66,7 @@ class MazeData(object):
     def __init__(self):
         self.obj = None
         self.mazedict = {0: Maze1, 1: Maze2}
+        self.path = "mazes/"
 
     def loadMaze(self, level):
         self.obj = self.mazedict[level % len(self.mazedict)]()
