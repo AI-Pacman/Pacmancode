@@ -8,12 +8,13 @@ BASETILEWIDTH = 16
 BASETILEHEIGHT = 16
 DEATH = 5
 
+FILEPATH = "spritesheets/"
+FILENAME = "spritesheet.png"
+
 
 class Spritesheet(object):
     def __init__(self):
-        filepath = "spritesheets/"
-        filename = "spritesheet.png"
-        self.sheet = pygame.image.load(filepath + filename).convert()
+        self.sheet = pygame.image.load(FILEPATH + FILENAME).convert()
         transcolor = self.sheet.get_at((0, 0))
         self.sheet.set_colorkey(transcolor)
         width = int(self.sheet.get_width() / BASETILEWIDTH * TILEWIDTH)
