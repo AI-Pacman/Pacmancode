@@ -151,6 +151,11 @@ class GameController(object):
             afterPauseMethod()
         self.checkEvents()
         self.render()
+        # Check for button clicks
+        mouse_pos = pygame.mouse.get_pos()
+        start_button, exit_button = self.create_buttons()
+        if pygame.mouse.get_pressed()[0]:
+            self.handle_button_click(mouse_pos, start_button, exit_button)
 
     def checkEvents(self):
         for event in pygame.event.get():
@@ -280,7 +285,43 @@ class GameController(object):
     def updateScore(self, points):
         self.score += points
         self.textgroup.updateScore(self.score)
+    # creat buttons
+    def create_buttons(self):
+        start_button_rect = pygame.Rect(SCREENWIDTH - 250, 200, 200, 50)
+        exit_button_rect = pygame.Rect(SCREENWIDTH - 250, 270, 200, 50)
 
+        start_button = pygame.draw.rect(self.screen, GREEN, start_button_rect)
+        exit_button = pygame.draw.rect(self.screen, RED, exit_button_rect)
+
+        font = pygame.font.Font(None, 36)
+        start_text = font.render("Start Game", True, WHITE)
+        exit_text = font.render("Exit", True, WHITE)
+
+        start_text_rect = start_text.get_rect(center=start_button_rect.center)
+        exit_text_rect = exit_text.get_rect(center=exit_button_rect.center)
+
+        self.screen.blit(start_text, start_text_rect)
+        self.screen.blit(exit_text, exit_text_rect)
+
+        return start_button, exit_button
+
+    def handle_button_click(self, pos, start_button, exit_button):
+        if start_button.collidepoint(pos):
+            self.handle_space_key()
+        elif exit_button.collidepoint(pos):
+            pygame.quit()
+            exit()
+
+    def handle_space_key(self):
+        # Xử lý sự kiện tương tự khi nhấn phím cách (Space)
+        if self.pacman.alive:
+            self.pause.setPause(playerPaused=True)
+            if not self.pause.paused:
+                self.textgroup.hideText()
+                self.showEntities()
+            else:
+                self.textgroup.showText(PAUSETXT)
+                
     def render(self):
         self.screen.blit(self.background, (0, 0))
         # self.nodes.render(self.screen)
@@ -300,7 +341,7 @@ class GameController(object):
             x = SCREENWIDTH - self.fruitCaptured[i].get_width() * (i + 1)
             y = SCREENHEIGHT - self.fruitCaptured[i].get_height()
             self.screen.blit(self.fruitCaptured[i], (x, y))
-
+        start_button, exit_button = self.create_buttons()
         pygame.display.update()
 
 
