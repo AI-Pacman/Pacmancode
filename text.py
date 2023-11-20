@@ -3,6 +3,7 @@ import pygame
 from constants import *
 from vector import Vector2
 
+FONTFAMILY = "font/PressStart2P-Regular.ttf"
 
 class Text(object):
     def __init__(self, text, color, x, y, size, time=None, id=None, visible=True):
@@ -16,7 +17,7 @@ class Text(object):
         self.lifespan = time
         self.label = None
         self.destroy = False
-        self.setupFont("PressStart2P-Regular.ttf")
+        self.setupFont(FONTFAMILY)
         self.createLabel()
 
     def setupFont(self, fontpath):
