@@ -34,6 +34,9 @@ class GameController(object):
         self.fruitCaptured = []
         self.fruitNode = None
         self.mazedata = MazeData()
+        self.current_algorithm = "Alogorithms"  
+        self.haveghosts = False
+       
 
     def setBackground(self):
         self.background_norm = pygame.surface.Surface(SCREENSIZE).convert()
@@ -87,44 +90,13 @@ class GameController(object):
         self.ghosts.clyde.startNode.denyAccess(LEFT, self.ghosts.clyde)
         self.mazedata.obj.denyGhostsAccess(self.ghosts, self.nodes)
 
-    # def startGame_old(self):
-    #     mazefile = "mazes/maze1.txt"
-    #     rotfile = "mazes/maze1_rotation.txt"
-
-    #     self.mazedata.loadMaze(self.level)  #######
-    #     self.mazesprites = MazeSprites(mazefile, rotfile)
-    #     self.setBackground()
-    #     self.nodes = NodeGroup(mazefile)
-    #     self.nodes.setPortalPair((0, 17), (27, 17))
-    #     homekey = self.nodes.createHomeNodes(11.5, 14)
-    #     self.nodes.connectHomeNodes(homekey, (12, 14), LEFT)
-    #     self.nodes.connectHomeNodes(homekey, (15, 14), RIGHT)
-    #     self.pacman = Pacman(self.nodes.getNodeFromTiles(15, 26))
-    #     self.pellets = PelletGroup(mazefile)
-    #     self.ghosts = GhostGroup(self.nodes.getStartTempNode(), self.pacman)
-    #     self.ghosts.blinky.setStartNode(self.nodes.getNodeFromTiles(2 + 11.5, 0 + 14))
-    #     self.ghosts.pinky.setStartNode(self.nodes.getNodeFromTiles(2 + 11.5, 3 + 14))
-    #     self.ghosts.inky.setStartNode(self.nodes.getNodeFromTiles(0 + 11.5, 3 + 14))
-    #     self.ghosts.clyde.setStartNode(self.nodes.getNodeFromTiles(4 + 11.5, 3 + 14))
-    #     self.ghosts.setSpawnNode(self.nodes.getNodeFromTiles(2 + 11.5, 3 + 14))
-
-    #     self.nodes.denyHomeAccess(self.pacman)
-    #     self.nodes.denyHomeAccessList(self.ghosts)
-    #     self.nodes.denyAccessList(2 + 11.5, 3 + 14, LEFT, self.ghosts)
-    #     self.nodes.denyAccessList(2 + 11.5, 3 + 14, RIGHT, self.ghosts)
-    #     self.ghosts.inky.startNode.denyAccess(RIGHT, self.ghosts.inky)
-    #     self.ghosts.clyde.startNode.denyAccess(LEFT, self.ghosts.clyde)
-    #     self.nodes.denyAccessList(12, 14, UP, self.ghosts)
-    #     self.nodes.denyAccessList(15, 14, UP, self.ghosts)
-    #     self.nodes.denyAccessList(12, 26, UP, self.ghosts)
-    #     self.nodes.denyAccessList(15, 26, UP, self.ghosts)
-
     def update(self):
         dt = self.clock.tick(30) / 1000.0
         self.textgroup.update(dt)
         self.pellets.update(dt)
         if not self.pause.paused:
-            # self.ghosts.update(dt)
+            if self.haveghosts:
+                self.ghosts.update(dt)
             if self.fruit is not None:
                 self.fruit.update(dt)
             self.checkPelletEvents()
@@ -133,9 +105,9 @@ class GameController(object):
 
         if self.pacman.alive:
             if not self.pause.paused:
-                self.pacman.update(dt,self.pellets.pelletList) # add pellet code 
+                self.pacman.update(dt,self.pellets.pelletList, self.current_algorithm) # add pellet code 
         else:
-            self.pacman.update(dt,self.pellets.powerpellets)  # add pellet code
+            self.pacman.update(dt,self.pellets.powerpellets, self.current_algorithm)  # add pellet code
 
         if self.flashBG:
             self.flashTimer += dt
@@ -153,10 +125,12 @@ class GameController(object):
         self.render()
         # Check for button clicks
         mouse_pos = pygame.mouse.get_pos()
-        start_button, exit_button = self.create_buttons()
+        start_button, exit_button, algorithm_button, ghost_button = self.create_buttons()
         if pygame.mouse.get_pressed()[0]:
-            self.handle_button_click(mouse_pos, start_button, exit_button)
+            self.handle_button_click(mouse_pos, start_button, exit_button, algorithm_button, ghost_button)
 
+        
+        
     def checkEvents(self):
         for event in pygame.event.get():
             if event.type == QUIT:
@@ -289,7 +263,8 @@ class GameController(object):
     def create_buttons(self):
         start_button_rect = pygame.Rect(SCREENWIDTH - 250, 200, 200, 50)
         exit_button_rect = pygame.Rect(SCREENWIDTH - 250, 270, 200, 50)
-
+        
+        
         start_button = pygame.draw.rect(self.screen, GREEN, start_button_rect)
         exit_button = pygame.draw.rect(self.screen, RED, exit_button_rect)
 
@@ -300,18 +275,43 @@ class GameController(object):
         start_text_rect = start_text.get_rect(center=start_button_rect.center)
         exit_text_rect = exit_text.get_rect(center=exit_button_rect.center)
 
+        algorithm_button_rect = pygame.Rect(SCREENWIDTH - 250, 340, 200, 50)
+        algorithm_button = pygame.draw.rect(self.screen, BLUE, algorithm_button_rect)
+        algorithm_text = font.render(self.current_algorithm, True, WHITE)
+        algorithm_text_rect = algorithm_text.get_rect(center=algorithm_button_rect.center)
+        
+        ghost_button_rect = pygame.Rect(SCREENWIDTH - 250, 410, 200, 50)
+        ghost_button = pygame.draw.rect(self.screen, BLUE, ghost_button_rect)
+        ghost_text = font.render("Ghost", True, WHITE)
+        ghost_text_rect = ghost_text.get_rect(center=ghost_button_rect.center)
+        # Check the status of self.haveghost to determine the text behind the "Ghost" button
+      
+        ghost_status_text = font.render(str(self.haveghosts), True, WHITE)
+
+        ghost_status_rect = ghost_status_text.get_rect(center=(ghost_button_rect.centerx, ghost_button_rect.centery + 30))
+        
+        self.screen.blit(algorithm_text, algorithm_text_rect)
         self.screen.blit(start_text, start_text_rect)
         self.screen.blit(exit_text, exit_text_rect)
+        self.screen.blit(ghost_text, ghost_text_rect)
+        self.screen.blit(ghost_status_text, ghost_status_rect)
+        return start_button, exit_button, algorithm_button, ghost_button
 
-        return start_button, exit_button
-
-    def handle_button_click(self, pos, start_button, exit_button):
+    def handle_button_click(self, pos, start_button, exit_button, algorithm_button, ghost_button):
         if start_button.collidepoint(pos):
             self.handle_space_key()
         elif exit_button.collidepoint(pos):
             pygame.quit()
             exit()
-
+        elif algorithm_button.collidepoint(pos):
+            # Handle Algorithm button click
+            self.change_algorithm()
+        elif ghost_button.collidepoint(pos):
+           if self.haveghosts:
+               self.haveghosts = False 
+           else:
+               self.haveghosts = True
+        
     def handle_space_key(self):
         # Xử lý sự kiện tương tự khi nhấn phím cách (Space)
         if self.pacman.alive:
@@ -321,7 +321,26 @@ class GameController(object):
                 self.showEntities()
             else:
                 self.textgroup.showText(PAUSETXT)
-                
+    
+    def change_algorithm(self):
+        if self.current_algorithm == "Alogorithms":
+            self.current_algorithm = "DFS" 
+        elif self.current_algorithm == "DFS":
+            self.current_algorithm = "DFS_D"
+        elif self.current_algorithm == "DFS_D":
+            self.current_algorithm = "ID_DFS"
+        elif self.current_algorithm == "ID_DFS":
+            self.current_algorithm = "BFS"
+        elif self.current_algorithm == "BFS":
+            self.current_algorithm = "Greedy"
+        elif self.current_algorithm == "Greedy":
+            self.current_algorithm = "DFS"
+        else:
+            # Default to DFS if the current algorithm is not recognized
+            self.current_algorithm = "DFS"
+    
+
+    # end code button            
     def render(self):
         self.screen.blit(self.background, (0, 0))
         # self.nodes.render(self.screen)
@@ -341,7 +360,7 @@ class GameController(object):
             x = SCREENWIDTH - self.fruitCaptured[i].get_width() * (i + 1)
             y = SCREENHEIGHT - self.fruitCaptured[i].get_height()
             self.screen.blit(self.fruitCaptured[i], (x, y))
-        start_button, exit_button = self.create_buttons()
+        start_button, exit_button, algorithm_button, ghost_button  = self.create_buttons()
         pygame.display.update()
 
 

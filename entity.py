@@ -19,7 +19,7 @@ class Entity(object):
             STOP: Vector2(),
         }
         self.direction = STOP
-        self.setSpeed(100)
+        self.setSpeed(300)
         self.radius = 10
         self.collideRadius = 5
         self.color = WHITE

@@ -55,7 +55,6 @@ def calculate_heuristic(current_position, target_position):
     dy = current_position.y - target_position.y
     return dx**2 + dy**2  # Euclidean distance squared
 
-
 def greedy_search(start_node, pellet_node):
     priority_queue = PriorityQueue()
     visited = set()
@@ -83,3 +82,36 @@ def greedy_search(start_node, pellet_node):
 
     # Nếu hàm chạy đến đây, có nghĩa là không thể đến được pellet_node
     return None
+
+def depth_first_search_D(start_node, pellet_node, max_depth ):
+    
+    stack = Stack()
+    visited = set()
+
+    stack.push((start_node, []))  # (current_node, path)
+    while not stack.isEmpty():
+        current_node, path = stack.pop()
+        if current_node in visited or len(path) > max_depth:
+            continue
+
+        visited.add(current_node)
+
+        if current_node == pellet_node:
+            return path
+
+        # Thêm tất cả các hàng xóm chưa được thăm vào stack
+        for direction, neighbor in current_node.neighbors.items():
+            if neighbor is not None and neighbor not in visited:
+                stack.push((neighbor, path + [direction]))
+
+    # Nếu hàm chạy đến đây, có nghĩa là không thể đến được pellet_node với độ sâu tối đa
+    return None
+
+def dfs_with_iterative_deepening(start_node, pellet_node):
+    max_depth = 1
+    while True:
+        result = depth_first_search_D(start_node, pellet_node, max_depth)
+        if result is not None:
+            return result
+        max_depth += 1
+
