@@ -7,6 +7,7 @@ from constants import *
 from vector import Vector2
 
 
+
 class Entity(object):
     def __init__(self, node):
         self.name = None
@@ -51,12 +52,20 @@ class Entity(object):
             self.setPosition()
 
     def validDirection(self, direction):
-        if direction is not STOP:
-            if self.name in self.node.access[direction]:
-                if self.node.neighbors[direction] is not None:
-                    return True
+        # add code to fix bug
+        try:
+            if direction is not STOP:
+                if self.name in self.node.access[direction]:
+                    if self.node.neighbors[direction] is not None:
+                        return True
+        except KeyError:
+            
+            # Handle the KeyError here, for example, print a message
+            print(f"KeyError: Direction {direction} not found in node.access")
+            return False
         return False
-
+        # end add code
+    
     def getNewTarget(self, direction):
         if self.validDirection(direction):
             return self.node.neighbors[direction]
@@ -129,9 +138,33 @@ class Entity(object):
     def render(self, screen):
         if self.visible:
             if self.image is not None:
+                # Add code 
+                # Draw the path in green
+                for direction in self.path:
+                    if self.node.neighbors[direction] is not None:
+                        line_start = self.node.position.asTuple()
+                        line_end = self.node.neighbors[direction].position.asTuple()
+                        pygame.draw.line(screen, GREEN, line_start, line_end, 4)
+                p = self.position.asInt()
+                    
+                   
+                pygame.draw.circle(screen, self.color, p, self.radius)
+                # end add code
                 adjust = Vector2(TILEWIDTH, TILEHEIGHT) / 2
                 p = self.position - adjust
                 screen.blit(self.image, p.asTuple())
             else:
+                # Add code 
+                # Draw the path in green
+                for direction in self.path:
+                    if self.node.neighbors[direction] is not None:
+                        line_start = self.node.position.asTuple()
+                        line_end = self.node.neighbors[direction].position.asTuple()
+                        pygame.draw.line(screen, GREEN, line_start, line_end, 4)
+                p = self.position.asInt()
+                    
+                    
+                pygame.draw.circle(screen, self.color, p, self.radius)
+                # end add code
                 p = self.position.asInt()
                 pygame.draw.circle(screen, self.color, p, self.radius)

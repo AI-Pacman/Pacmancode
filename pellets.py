@@ -6,7 +6,7 @@ from vector import Vector2
 
 
 class Pellet(object):
-    def __init__(self, row, column):
+    def __init__(self, row, column, node = None):
         self.name = PELLET
         self.position = Vector2(column * TILEWIDTH, row * TILEHEIGHT)
         self.color = WHITE
@@ -14,6 +14,11 @@ class Pellet(object):
         self.collideRadius = 2 * TILEWIDTH / 16
         self.points = 10
         self.visible = True
+        # add code
+        # node của pellet
+        self.node = node
+        # end add code
+        
 
     def render(self, screen):
         if self.visible:
@@ -23,7 +28,7 @@ class Pellet(object):
 
 
 class PowerPellet(Pellet):
-    def __init__(self, row, column):
+    def __init__(self, row, column, node = None):
         Pellet.__init__(self, row, column)
         self.name = POWERPELLET
         self.radius = int(8 * TILEWIDTH / 16)
@@ -39,24 +44,31 @@ class PowerPellet(Pellet):
 
 
 class PelletGroup(object):
-    def __init__(self, pelletfile):
+    def __init__(self, pelletfile, nodeGroup):
         self.pelletList = []
         self.powerpellets = []
-        self.createPelletList(pelletfile)
+        self.createPelletList(pelletfile, nodeGroup)
         self.numEaten = 0
 
     def update(self, dt):
         for powerpellet in self.powerpellets:
             powerpellet.update(dt)
 
-    def createPelletList(self, pelletfile):
+    def createPelletList(self, pelletfile, nodeGroup):
         data = self.readPelletfile(pelletfile)
         for row in range(data.shape[0]):
             for col in range(data.shape[1]):
                 if data[row][col] in [".", "+"]:
-                    self.pelletList.append(Pellet(row, col))
+                    pellet = Pellet(row, col)
+                    # add code
+                    pellet.node = nodeGroup.getNodeFromTiles( col, row)
+                    #end code
+                    self.pelletList.append(pellet)
                 elif data[row][col] in ["P", "p"]:
                     pp = PowerPellet(row, col)
+                    #add code 
+                    pp.node = nodeGroup.getNodeFromTiles( col, row)
+                    #end code
                     self.pelletList.append(pp)
                     self.powerpellets.append(pp)
 

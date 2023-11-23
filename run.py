@@ -62,12 +62,12 @@ class GameController(object):
         self.pacman = Pacman(
             self.nodes.getNodeFromTiles(*self.mazedata.obj.pacmanStart)
         )
-        self.pellets = PelletGroup(self.mazedata.path + self.mazedata.obj.name + ".txt")
+        self.pellets = PelletGroup(self.mazedata.path + self.mazedata.obj.name + ".txt", self.nodes)
         self.ghosts = GhostGroup(self.nodes.getStartTempNode(), self.pacman)
 
         self.ghosts.pinky.setStartNode(
             self.nodes.getNodeFromTiles(*self.mazedata.obj.addOffset(2, 3))
-        )
+         )
         self.ghosts.inky.setStartNode(
             self.nodes.getNodeFromTiles(*self.mazedata.obj.addOffset(0, 3))
         )
@@ -124,7 +124,7 @@ class GameController(object):
         self.textgroup.update(dt)
         self.pellets.update(dt)
         if not self.pause.paused:
-            self.ghosts.update(dt)
+            # self.ghosts.update(dt)
             if self.fruit is not None:
                 self.fruit.update(dt)
             self.checkPelletEvents()
@@ -133,9 +133,9 @@ class GameController(object):
 
         if self.pacman.alive:
             if not self.pause.paused:
-                self.pacman.update(dt)
+                self.pacman.update(dt,self.pellets.pelletList) # add pellet code 
         else:
-            self.pacman.update(dt)
+            self.pacman.update(dt,self.pellets.powerpellets)  # add pellet code
 
         if self.flashBG:
             self.flashTimer += dt

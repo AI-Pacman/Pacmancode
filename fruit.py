@@ -16,7 +16,7 @@ class Fruit(Entity):
         self.points = 100 + level * 20
         self.setBetweenNodes(RIGHT)
         self.sprites = FruitSprites(self, level)
-
+        self.path = []
     def update(self, dt):
         self.timer += dt
         if self.timer >= self.lifespan:

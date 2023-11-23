@@ -31,14 +31,34 @@ class Node(object):
                 line_end = self.neighbors[n].position.asTuple()
                 pygame.draw.line(screen, WHITE, line_start, line_end, 4)
                 pygame.draw.circle(screen, RED, self.position.asInt(), 12)
-
-
+    # add code to AI search
+    def asTuple(self):
+        return self.position.asTuple()
+    
+    def __eq__(self, other):
+        return self.position == other.position
+    
+    def __hash__(self):
+        return hash(self.position)
+    
+    def __lt__(self, other):
+        # Compare nodes based on their positions
+        return self.position < other.position
+    # end add code to AI search
+    
 class NodeGroup(object):
     def __init__(self, level):
         self.level = level
         self.nodesLUT = {}
-        self.nodeSymbols = ["+", "P", "n"]
-        self.pathSymbols = [".", "-", "|", "p"]
+        
+        # thêm các pellets vào nodeLUT
+        # self.nodeSymbols = ["+", "P", "n"]
+        # self.pathSymbols = [".", "-", "|", "p"]
+        self.nodeSymbols = ['+', 'P', 'n','.', 'p']
+        self.pathSymbols = [ '.','-', '|', 'p']
+        
+        # end add code 
+        
         data = self.readMazeFile(level)
         self.createNodeTable(data)
         self.connectHorizontally(data)

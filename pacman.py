@@ -5,7 +5,7 @@ from constants import *
 from entity import Entity
 from sprites import PacmanSprites
 from vector import Vector2
-
+from AIpacmanSearch import *
 
 class Pacman(Entity):
     def __init__(self, node):
@@ -16,7 +16,10 @@ class Pacman(Entity):
         self.setBetweenNodes(LEFT)
         self.alive = True
         self.sprites = PacmanSprites(self)
+        # add code 
+        self.path = []  # Add this line to store the path
 
+        # end add code
     def reset(self):
         Entity.reset(self)
         self.direction = LEFT
@@ -29,7 +32,29 @@ class Pacman(Entity):
         self.alive = False
         self.direction = STOP
 
-    def update(self, dt):
+    def update(self, dt, pellets):
+        # add code 
+        # Use AI search to find the direction towards the nearest pellet
+        pellet_positions = [pellet.node for pellet in pellets]
+            
+        for pellet_node in pellet_positions:
+                # path_to_pellet = depth_first_search(self.node, pellet_node )
+                path_to_pellet = breadth_first_search(self.node, pellet_node)
+                # path_to_pellet = greedy_search(self.node, pellet_node)
+                if path_to_pellet is not None:
+                    self.path = path_to_pellet
+                    # print(f"Path to pellet {pellet_node}: {path_to_pellet}")
+                    # Now you can use path_to_pellet to update the direction and target
+                    if path_to_pellet:
+                        next_direction = path_to_pellet[0]
+                        self.direction = next_direction
+                        self.target = self.getNewTarget(next_direction)
+                        # self.direction = STOP
+                        
+                else:
+                    print(f"Pellet {pellet_node} is unreachable.")
+        # end add code
+        
         self.sprites.update(dt)
         self.position += self.directions[self.direction] * self.speed * dt
         direction = self.getValidKey()
