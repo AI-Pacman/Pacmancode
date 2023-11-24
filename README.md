@@ -1,3 +1,3 @@
 # Pacmancode
 
-https://pacmancode.com/
+<https://pacmancode.com/>

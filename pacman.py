@@ -3,9 +3,10 @@ from pygame.locals import *
 
 from constants import *
 from entity import Entity
+from search import *
 from sprites import PacmanSprites
 from vector import Vector2
-from AIpacmanSearch import *
+
 
 class Pacman(Entity):
     def __init__(self, node):
@@ -16,7 +17,7 @@ class Pacman(Entity):
         self.setBetweenNodes(LEFT)
         self.alive = True
         self.sprites = PacmanSprites(self)
-        # add code 
+        # add code
         self.path = []  # Add this line to store the path
 
         # end add code
@@ -33,7 +34,7 @@ class Pacman(Entity):
         self.direction = STOP
 
     def update(self, dt, pellets,current_algorithm):
-        # add code 
+        # add code
         # Use AI search to find the direction towards the nearest pellet
         pellet_positions = [pellet.node for pellet in pellets]
         # visited_array=set()
@@ -54,7 +55,7 @@ class Pacman(Entity):
                 else:
                     path_to_pellet = depth_first_search(self.node, pellet_node)
                     # raise ValueError(f"Invalid algorithm: {current_algorithm}")
-                
+
                 if path_to_pellet is not None:
                     self.path = path_to_pellet
                     # print(f"Path to pellet {pellet_node}: {path_to_pellet}")
@@ -64,11 +65,11 @@ class Pacman(Entity):
                         self.direction = next_direction
                         self.target = self.getNewTarget(next_direction)
                         # self.direction = STOP
-                        
+
                 else:
                     print(f"Pellet {pellet_node} is unreachable.")
         # end add code
-        
+
         self.sprites.update(dt)
         self.position += self.directions[self.direction] * self.speed * dt
         direction = self.getValidKey()
