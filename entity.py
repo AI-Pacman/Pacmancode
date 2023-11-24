@@ -63,7 +63,6 @@ class Entity(object):
             # Handle the KeyError here, for example, print a message
             print(f"KeyError: Direction {direction} not found in node.access")
             return False
-        return False
         # end add code
     
     def getNewTarget(self, direction):

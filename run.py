@@ -334,6 +334,8 @@ class GameController(object):
         elif self.current_algorithm == "BFS":
             self.current_algorithm = "Greedy"
         elif self.current_algorithm == "Greedy":
+            self.current_algorithm = "A_STAR"
+        elif self.current_algorithm == "A_STAR":
             self.current_algorithm = "DFS"
         else:
             # Default to DFS if the current algorithm is not recognized
