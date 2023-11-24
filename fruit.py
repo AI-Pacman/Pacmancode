@@ -1,5 +1,3 @@
-import pygame
-
 from constants import *
 from entity import Entity
 from sprites import FruitSprites
@@ -14,7 +12,7 @@ class Fruit(Entity):
         self.timer = 0
         self.destroy = False
         self.points = 100 + level * 20
-        self.setBetweenNodes(RIGHT)
+        self.set_between_nodes(RIGHT)
         self.sprites = FruitSprites(self, level)
 
     def update(self, dt):

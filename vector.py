@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import math
 
 
@@ -7,10 +9,10 @@ class Vector2(object):
         self.y = y
         self.thresh = 0.000001
 
-    def __add__(self, other):
+    def __add__(self, other: Vector2):
         return Vector2(self.x + other.x, self.y + other.y)
 
-    def __sub__(self, other):
+    def __sub__(self, other: Vector2):
         return Vector2(self.x - other.x, self.y - other.y)
 
     def __neg__(self):
@@ -20,32 +22,32 @@ class Vector2(object):
         return Vector2(self.x * scalar, self.y * scalar)
 
     def __div__(self, scalar):
-        if scalar != 0:
-            return Vector2(self.x / float(scalar), self.y / float(scalar))
-        return None
+        # if scalar != 0:
+        return Vector2(self.x / scalar, self.y / scalar)
+        # return None
 
     def __truediv__(self, scalar):
         return self.__div__(scalar)
 
-    def __eq__(self, other):
+    def __eq__(self, other: Vector2):
         if abs(self.x - other.x) < self.thresh:
             if abs(self.y - other.y) < self.thresh:
                 return True
         return False
 
-    def magnitudeSquared(self):
+    def magnitude_squared(self):
         return self.x**2 + self.y**2
 
     def magnitude(self):
-        return math.sqrt(self.magnitudeSquared())
+        return math.sqrt(self.magnitude_squared())
 
     def copy(self):
         return Vector2(self.x, self.y)
 
-    def asTuple(self):
+    def as_tuple(self):
         return self.x, self.y
 
-    def asInt(self):
+    def as_int(self):
         return int(self.x), int(self.y)
 
     def __str__(self):

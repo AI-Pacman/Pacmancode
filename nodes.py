@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import numpy as np
 import pygame
 
@@ -8,7 +10,8 @@ from vector import Vector2
 class Node(object):
     def __init__(self, x, y):
         self.position = Vector2(x, y)
-        self.neighbors = {UP: None, DOWN: None, LEFT: None, RIGHT: None, PORTAL: None}
+        self.neighbors: dict[int, Node] = {
+            UP: None, DOWN: None, LEFT: None, RIGHT: None, PORTAL: None}
         self.access = {
             UP: [PACMAN, BLINKY, PINKY, INKY, CLYDE, FRUIT],
             DOWN: [PACMAN, BLINKY, PINKY, INKY, CLYDE, FRUIT],
@@ -16,92 +19,96 @@ class Node(object):
             RIGHT: [PACMAN, BLINKY, PINKY, INKY, CLYDE, FRUIT],
         }
 
-    def denyAccess(self, direction, entity):
+    def deny_access(self, direction, entity):
         if entity.name in self.access[direction]:
             self.access[direction].remove(entity.name)
 
-    def allowAccess(self, direction, entity):
+    def allow_access(self, direction, entity):
         if entity.name not in self.access[direction]:
             self.access[direction].append(entity.name)
 
     def render(self, screen):
-        for n in self.neighbors.keys():
-            if self.neighbors[n] is not None:
-                line_start = self.position.asTuple()
-                line_end = self.neighbors[n].position.asTuple()
+        for node in self.neighbors.values():
+            if node is not None:
+                line_start = self.position.as_tuple()
+                line_end = node.position.as_tuple()
                 pygame.draw.line(screen, WHITE, line_start, line_end, 4)
-                pygame.draw.circle(screen, RED, self.position.asInt(), 12)
+                pygame.draw.circle(screen, RED, self.position.as_int(), 12)
 
 
 class NodeGroup(object):
     def __init__(self, level):
         self.level = level
-        self.nodesLUT = {}
-        self.nodeSymbols = ["+", "P", "n"]
-        self.pathSymbols = [".", "-", "|", "p"]
-        data = self.readMazeFile(level)
-        self.createNodeTable(data)
-        self.connectHorizontally(data)
-        self.connectVertically(data)
-        self.homekey = None
+        self.nodes_lookup_table: dict[tuple[int, int], Node] = {}
+        self.node_symbols = ["+", "P", "n"]
+        self.path_symbols = [".", "-", "|", "p"]
+        data = self.read_maze_file(level)
+        self.create_node_table(data)
+        self.connect_horizontally(data)
+        self.connect_vertically(data)
+        self.home_key: tuple[int, int]
 
-    def readMazeFile(self, textfile):
+    def read_maze_file(self, textfile):
         return np.loadtxt(textfile, dtype="<U1")
 
-    def createNodeTable(self, data, xoffset=0, yoffset=0):
+    def create_node_table(self, data, x_offset=0, y_offset=0):
         for row in list(range(data.shape[0])):
             for col in list(range(data.shape[1])):
-                if data[row][col] in self.nodeSymbols:
-                    x, y = self.constructKey(col + xoffset, row + yoffset)
-                    self.nodesLUT[(x, y)] = Node(x, y)
+                if data[row][col] in self.node_symbols:
+                    x, y = self.construct_key(col + x_offset, row + y_offset)
+                    self.nodes_lookup_table[(x, y)] = Node(x, y)
 
-    def constructKey(self, x, y):
+    def construct_key(self, x, y):
         return x * TILEWIDTH, y * TILEHEIGHT
 
-    def connectHorizontally(self, data, xoffset=0, yoffset=0):
+    def connect_horizontally(self, data, x_offset=0, y_offset=0):
         for row in list(range(data.shape[0])):
             key = None
             for col in list(range(data.shape[1])):
-                if data[row][col] in self.nodeSymbols:
+                if data[row][col] in self.node_symbols:
                     if key is None:
-                        key = self.constructKey(col + xoffset, row + yoffset)
+                        key = self.construct_key(
+                            col + x_offset, row + y_offset)
                     else:
-                        otherkey = self.constructKey(col + xoffset, row + yoffset)
-                        self.nodesLUT[key].neighbors[RIGHT] = self.nodesLUT[otherkey]
-                        self.nodesLUT[otherkey].neighbors[LEFT] = self.nodesLUT[key]
-                        key = otherkey
-                elif data[row][col] not in self.pathSymbols:
+                        other_key = self.construct_key(
+                            col + x_offset, row + y_offset)
+                        self.nodes_lookup_table[key].neighbors[RIGHT] = self.nodes_lookup_table[other_key]
+                        self.nodes_lookup_table[other_key].neighbors[LEFT] = self.nodes_lookup_table[key]
+                        key = other_key
+                elif data[row][col] not in self.path_symbols:
                     key = None
 
-    def connectVertically(self, data, xoffset=0, yoffset=0):
-        dataT = data.transpose()
-        for col in list(range(dataT.shape[0])):
+    def connect_vertically(self, data, x_offset=0, y_offset=0):
+        data_transposed = data.transpose()
+        for col in list(range(data_transposed.shape[0])):
             key = None
-            for row in list(range(dataT.shape[1])):
-                if dataT[col][row] in self.nodeSymbols:
+            for row in list(range(data_transposed.shape[1])):
+                if data_transposed[col][row] in self.node_symbols:
                     if key is None:
-                        key = self.constructKey(col + xoffset, row + yoffset)
+                        key = self.construct_key(
+                            col + x_offset, row + y_offset)
                     else:
-                        otherkey = self.constructKey(col + xoffset, row + yoffset)
-                        self.nodesLUT[key].neighbors[DOWN] = self.nodesLUT[otherkey]
-                        self.nodesLUT[otherkey].neighbors[UP] = self.nodesLUT[key]
-                        key = otherkey
-                elif dataT[col][row] not in self.pathSymbols:
+                        other_key = self.construct_key(
+                            col + x_offset, row + y_offset)
+                        self.nodes_lookup_table[key].neighbors[DOWN] = self.nodes_lookup_table[other_key]
+                        self.nodes_lookup_table[other_key].neighbors[UP] = self.nodes_lookup_table[key]
+                        key = other_key
+                elif data_transposed[col][row] not in self.path_symbols:
                     key = None
 
-    def getStartTempNode(self):
-        nodes = list(self.nodesLUT.values())
+    def get_start_temp_node(self):
+        nodes = list(self.nodes_lookup_table.values())
         return nodes[0]
 
-    def setPortalPair(self, pair1, pair2):
-        key1 = self.constructKey(*pair1)
-        key2 = self.constructKey(*pair2)
-        if key1 in self.nodesLUT.keys() and key2 in self.nodesLUT.keys():
-            self.nodesLUT[key1].neighbors[PORTAL] = self.nodesLUT[key2]
-            self.nodesLUT[key2].neighbors[PORTAL] = self.nodesLUT[key1]
+    def set_portal_pair(self, pair1, pair2):
+        key1 = self.construct_key(*pair1)
+        key2 = self.construct_key(*pair2)
+        if key1 in self.nodes_lookup_table.keys() and key2 in self.nodes_lookup_table.keys():
+            self.nodes_lookup_table[key1].neighbors[PORTAL] = self.nodes_lookup_table[key2]
+            self.nodes_lookup_table[key2].neighbors[PORTAL] = self.nodes_lookup_table[key1]
 
-    def createHomeNodes(self, xoffset, yoffset):
-        homedata = np.array(
+    def create_home_nodes(self, x_offset, y_offset):
+        home_data = np.array(
             [
                 ["X", "X", "+", "X", "X"],
                 ["X", "X", ".", "X", "X"],
@@ -111,60 +118,61 @@ class NodeGroup(object):
             ]
         )
 
-        self.createNodeTable(homedata, xoffset, yoffset)
-        self.connectHorizontally(homedata, xoffset, yoffset)
-        self.connectVertically(homedata, xoffset, yoffset)
-        self.homekey = self.constructKey(xoffset + 2, yoffset)
-        return self.homekey
+        self.create_node_table(home_data, x_offset, y_offset)
+        self.connect_horizontally(home_data, x_offset, y_offset)
+        self.connect_vertically(home_data, x_offset, y_offset)
+        self.home_key = self.construct_key(x_offset + 2, y_offset)
+        return self.home_key
 
-    def connectHomeNodes(self, homekey, otherkey, direction):
-        key = self.constructKey(*otherkey)
-        self.nodesLUT[homekey].neighbors[direction] = self.nodesLUT[key]
-        self.nodesLUT[key].neighbors[direction * -1] = self.nodesLUT[homekey]
+    def connect_home_nodes(self, home_key, other_key, direction):
+        key = self.construct_key(*other_key)
+        self.nodes_lookup_table[home_key].neighbors[direction] = self.nodes_lookup_table[key]
+        self.nodes_lookup_table[key].neighbors[direction * -
+                                               1] = self.nodes_lookup_table[home_key]
 
-    def getNodeFromPixels(self, xpixel, ypixel):
-        if (xpixel, ypixel) in self.nodesLUT.keys():
-            return self.nodesLUT[(xpixel, ypixel)]
+    def get_nodes_from_pixels(self, x_pixel, y_pixel):
+        if (x_pixel, y_pixel) in self.nodes_lookup_table.keys():
+            return self.nodes_lookup_table[(x_pixel, y_pixel)]
         return None
 
-    def getNodeFromTiles(self, col, row):
-        x, y = self.constructKey(col, row)
-        if (x, y) in self.nodesLUT.keys():
-            return self.nodesLUT[(x, y)]
-        return None
+    def get_node_from_tiles(self, col, row) -> Node:
+        x, y = self.construct_key(col, row)
+        if (x, y) in self.nodes_lookup_table.keys():
+            return self.nodes_lookup_table[(x, y)]
+        return 
 
-    def denyAccess(self, col, row, direction, entity):
-        node = self.getNodeFromTiles(col, row)
+    def deny_access(self, col, row, direction, entity):
+        node = self.get_node_from_tiles(col, row)
         if node is not None:
-            node.denyAccess(direction, entity)
+            node.deny_access(direction, entity)
 
-    def allowAccess(self, col, row, direction, entity):
-        node = self.getNodeFromTiles(col, row)
+    def allow_access(self, col, row, direction, entity):
+        node = self.get_node_from_tiles(col, row)
         if node is not None:
-            node.allowAccess(direction, entity)
+            node.allow_access(direction, entity)
 
-    def denyAccessList(self, col, row, direction, entities):
+    def deny_access_list(self, col, row, direction, entities):
         for entity in entities:
-            self.denyAccess(col, row, direction, entity)
+            self.deny_access(col, row, direction, entity)
 
-    def allowAccessList(self, col, row, direction, entities):
+    def allow_access_list(self, col, row, direction, entities):
         for entity in entities:
-            self.allowAccess(col, row, direction, entity)
+            self.allow_access(col, row, direction, entity)
 
-    def denyHomeAccess(self, entity):
-        self.nodesLUT[self.homekey].denyAccess(DOWN, entity)
+    def deny_home_access(self, entity):
+        self.nodes_lookup_table[self.home_key].deny_access(DOWN, entity)
 
-    def allowHomeAccess(self, entity):
-        self.nodesLUT[self.homekey].allowAccess(DOWN, entity)
+    def allow_home_access(self, entity):
+        self.nodes_lookup_table[self.home_key].allow_access(DOWN, entity)
 
-    def denyHomeAccessList(self, entities):
+    def deny_home_access_list(self, entities):
         for entity in entities:
-            self.denyHomeAccess(entity)
+            self.deny_home_access(entity)
 
-    def allowHomeAccessList(self, entities):
+    def allow_home_access_list(self, entities):
         for entity in entities:
-            self.allowHomeAccess(entity)
+            self.allow_home_access(entity)
 
     def render(self, screen):
-        for node in self.nodesLUT.values():
+        for node in self.nodes_lookup_table.values():
             node.render(screen)
