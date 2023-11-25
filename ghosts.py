@@ -1,30 +1,27 @@
+import pygame
+from pygame.locals import *
+from vector import Vector2
 from constants import *
 from entity import Entity
 from modes import ModeController
-from nodes import Node
-from pacman import Pacman
 from sprites import GhostSprites
-from vector import Vector2
-
 
 class Ghost(Entity):
-    def __init__(self, node, pacman, blinky):
-        super().__init__(node)
+    def __init__(self, node, pacman=None, blinky=None):
+        Entity.__init__(self, node)
         self.name = GHOST
         self.points = 200
         self.goal = Vector2()
-        self.direction_method = self.goal_direction
-        self.pacman: Pacman = pacman
+        self.directionMethod = self.goalDirection
+        self.pacman = pacman
         self.mode = ModeController(self)
         self.blinky = blinky
-        self.home_node: Node = node
-        self.color: tuple[int, int, int]
-        self.sprites: GhostSprites
+        self.homeNode = node
 
     def reset(self):
         Entity.reset(self)
         self.points = 200
-        self.direction_method = self.goal_direction
+        self.directionMethod = self.goalDirection
 
     def update(self, dt):
         self.sprites.update(dt)
@@ -41,35 +38,36 @@ class Ghost(Entity):
     def chase(self):
         self.goal = self.pacman.position
 
-    def set_spawn_node(self, node: Node | None):
-        self.spawn_node = node
-
     def spawn(self):
-        if type(self.spawn_node) is Node:
-            self.goal = self.spawn_node.position
+        self.goal = self.spawnNode.position
 
-    def start_spawn(self):
-        self.mode.set_spawn_mode()
+    def setSpawnNode(self, node):
+        self.spawnNode = node
+
+    def startSpawn(self):
+        self.mode.setSpawnMode()
         if self.mode.current == SPAWN:
-            self.set_speed(150)
-            self.direction_method = self.goal_direction
+            self.setSpeed(150)
+            self.directionMethod = self.goalDirection
             self.spawn()
 
-    def start_freight(self):
-        self.mode.set_freight_mode()
+    def startFreight(self):
+        self.mode.setFreightMode()
         if self.mode.current == FREIGHT:
-            self.set_speed(50)
-            self.direction_method = self.random_direction
+            self.setSpeed(50)
+            self.directionMethod = self.randomDirection         
 
-    def normal_mode(self):
-        self.set_speed(100)
-        self.direction_method = self.goal_direction
-        self.home_node.deny_access(DOWN, self)
+    def normalMode(self):
+        self.setSpeed(100)
+        self.directionMethod = self.goalDirection
+        self.homeNode.denyAccess(DOWN, self)
+
+
 
 
 class Blinky(Ghost):
     def __init__(self, node, pacman=None, blinky=None):
-        super().__init__(node, pacman, blinky)
+        Ghost.__init__(self, node, pacman, blinky)
         self.name = BLINKY
         self.color = RED
         self.sprites = GhostSprites(self)
@@ -77,13 +75,13 @@ class Blinky(Ghost):
 
 class Pinky(Ghost):
     def __init__(self, node, pacman=None, blinky=None):
-        super().__init__(node, pacman, blinky)
+        Ghost.__init__(self, node, pacman, blinky)
         self.name = PINKY
         self.color = PINK
         self.sprites = GhostSprites(self)
 
     def scatter(self):
-        self.goal = Vector2(TILEWIDTH * NCOLS, 0)
+        self.goal = Vector2(TILEWIDTH*NCOLS, 0)
 
     def chase(self):
         self.goal = self.pacman.position + self.pacman.directions[self.pacman.direction] * TILEWIDTH * 4
@@ -91,13 +89,13 @@ class Pinky(Ghost):
 
 class Inky(Ghost):
     def __init__(self, node, pacman=None, blinky=None):
-        super().__init__(node, pacman, blinky)
+        Ghost.__init__(self, node, pacman, blinky)
         self.name = INKY
         self.color = TEAL
         self.sprites = GhostSprites(self)
 
     def scatter(self):
-        self.goal = Vector2(TILEWIDTH * NCOLS, TILEHEIGHT * NROWS)
+        self.goal = Vector2(TILEWIDTH*NCOLS, TILEHEIGHT*NROWS)
 
     def chase(self):
         vec1 = self.pacman.position + self.pacman.directions[self.pacman.direction] * TILEWIDTH * 2
@@ -107,18 +105,18 @@ class Inky(Ghost):
 
 class Clyde(Ghost):
     def __init__(self, node, pacman=None, blinky=None):
-        super().__init__(node, pacman, blinky)
+        Ghost.__init__(self, node, pacman, blinky)
         self.name = CLYDE
         self.color = ORANGE
         self.sprites = GhostSprites(self)
 
     def scatter(self):
-        self.goal = Vector2(0, TILEHEIGHT * NROWS)
+        self.goal = Vector2(0, TILEHEIGHT*NROWS)
 
     def chase(self):
         d = self.pacman.position - self.position
-        ds = d.magnitude_squared()
-        if ds <= (TILEWIDTH * 8) ** 2:
+        ds = d.magnitudeSquared()
+        if ds <= (TILEWIDTH * 8)**2:
             self.scatter()
         else:
             self.goal = self.pacman.position + self.pacman.directions[self.pacman.direction] * TILEWIDTH * 4
@@ -130,7 +128,7 @@ class GhostGroup(object):
         self.pinky = Pinky(node, pacman)
         self.inky = Inky(node, pacman, self.blinky)
         self.clyde = Clyde(node, pacman)
-        self.ghosts: list[Ghost] = [self.blinky, self.pinky, self.inky, self.clyde]
+        self.ghosts = [self.blinky, self.pinky, self.inky, self.clyde]
 
     def __iter__(self):
         return iter(self.ghosts)
@@ -139,20 +137,20 @@ class GhostGroup(object):
         for ghost in self:
             ghost.update(dt)
 
-    def start_freight(self):
+    def startFreight(self):
         for ghost in self:
-            ghost.start_freight()
-        self.reset_points()
+            ghost.startFreight()
+        self.resetPoints()
 
-    def set_spawn_mode(self, node: Node | None):
+    def setSpawnNode(self, node):
         for ghost in self:
-            ghost.set_spawn_node(node)
+            ghost.setSpawnNode(node)
 
-    def update_points(self):
+    def updatePoints(self):
         for ghost in self:
             ghost.points *= 2
 
-    def reset_points(self):
+    def resetPoints(self):
         for ghost in self:
             ghost.points = 200
 
@@ -171,3 +169,4 @@ class GhostGroup(object):
     def render(self, screen):
         for ghost in self:
             ghost.render(screen)
+

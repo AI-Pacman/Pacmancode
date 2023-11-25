@@ -2,23 +2,23 @@ class Pause(object):
     def __init__(self, paused=False):
         self.paused = paused
         self.timer = 0
-        self.pause_time = None
+        self.pauseTime = None
         self.func = None
-
+        
     def update(self, dt):
-        if self.pause_time is not None:
+        if self.pauseTime is not None:
             self.timer += dt
-            if self.timer >= self.pause_time:
+            if self.timer >= self.pauseTime:
                 self.timer = 0
                 self.paused = False
-                self.pause_time = None
+                self.pauseTime = None
                 return self.func
         return None
 
-    def set_pause(self, player_paused=False, pause_time=None, func=None):
+    def setPause(self, playerPaused=False, pauseTime=None, func=None):
         self.timer = 0
         self.func = func
-        self.pause_time = pause_time
+        self.pauseTime = pauseTime
         self.flip()
 
     def flip(self):

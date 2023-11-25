@@ -1,90 +1,54 @@
-from __future__ import annotations
-
-from typing import Sequence
-
 import pygame
-from pygame.locals import K_DOWN, K_LEFT, K_RIGHT, K_UP
-
+from pygame.locals import *
+from vector import Vector2
 from constants import *
 from entity import Entity
-from pellets import Pellet
-from search import *
 from sprites import PacmanSprites
-
-ALGORITHMS = ["ALGORITHMS", "BFS", "DFS", "IDDFS", "GREEDY", "A*"]
-
 
 class Pacman(Entity):
     def __init__(self, node):
-        super().__init__(node)
-        self.name = PACMAN
+        Entity.__init__(self, node )
+        self.name = PACMAN    
         self.color = YELLOW
         self.direction = LEFT
-        self.set_between_nodes(LEFT)
+        self.setBetweenNodes(LEFT)
         self.alive = True
         self.sprites = PacmanSprites(self)
 
     def reset(self):
         Entity.reset(self)
         self.direction = LEFT
-        self.set_between_nodes(LEFT)
+        self.setBetweenNodes(LEFT)
         self.alive = True
-        self.image = self.sprites.get_start_image()
+        self.image = self.sprites.getStartImage()
         self.sprites.reset()
 
     def die(self):
         self.alive = False
         self.direction = STOP
 
-    # def update(self, dt, pellets: Sequence[Pellet], current_algorithm: str):
-    def update(self, dt):
-        # pellet_positions = [pellet.node for pellet in pellets]
-        # for pellet_node in pellet_positions:
-
-        #     if current_algorithm == ALGORITHMS[1]:
-        #         path_to_pellet = breadth_first_search(self.node, pellet_node)
-        #     elif current_algorithm == ALGORITHMS[2]:
-        #         path_to_pellet = depth_first_search(self.node, pellet_node)
-        #     elif current_algorithm == ALGORITHMS[3]:
-        #         path_to_pellet = depth_first_search_iterative_deepening(self.node, pellet_node)
-        #     elif current_algorithm == ALGORITHMS[4]:
-        #         path_to_pellet = greedy_search(self.node, pellet_node)
-        #     elif current_algorithm == ALGORITHMS[5]:
-        #         path_to_pellet = a_star_search(self.node, pellet_node)
-        #     else:
-        #         path_to_pellet = breadth_first_search(self.node, pellet_node)
-
-        #     if path_to_pellet is not None:
-        #         self.path = path_to_pellet
-        #         if path_to_pellet:
-        #             next_direction = path_to_pellet[0]
-        #             self.direction = next_direction
-        #             self.target = self.get_new_target(next_direction)
-
-        #     else:
-        #         print(f"Pellet {pellet_node} is unreachable.")
-
+    def update(self, dt):	
         self.sprites.update(dt)
-        self.position += self.directions[self.direction] * self.speed * dt
-        direction = self.get_valid_key()
-        if self.overshot_target():
+        self.position += self.directions[self.direction]*self.speed*dt
+        direction = self.getValidKey()
+        if self.overshotTarget():
             self.node = self.target
             if self.node.neighbors[PORTAL] is not None:
                 self.node = self.node.neighbors[PORTAL]
-            self.target = self.get_new_target(direction)
+            self.target = self.getNewTarget(direction)
             if self.target is not self.node:
                 self.direction = direction
             else:
-                self.target = self.get_new_target(self.direction)
+                self.target = self.getNewTarget(self.direction)
 
             if self.target is self.node:
                 self.direction = STOP
-            self.set_position()
-        else:
-            if self.opposite_direction(direction):
-                self.reverse_direction()
+            self.setPosition()
+        else: 
+            if self.oppositeDirection(direction):
+                self.reverseDirection()
 
-    def get_valid_key(self):
+    def getValidKey(self):
         key_pressed = pygame.key.get_pressed()
         if key_pressed[K_UP]:
             return UP
@@ -94,21 +58,21 @@ class Pacman(Entity):
             return LEFT
         if key_pressed[K_RIGHT]:
             return RIGHT
-        return STOP
+        return STOP  
 
-    def eat_pellets(self, pellet_list):
-        for pellet in pellet_list:
-            if self.collide_check(pellet):
+    def eatPellets(self, pelletList):
+        for pellet in pelletList:
+            if self.collideCheck(pellet):
                 return pellet
-        return None
+        return None    
+    
+    def collideGhost(self, ghost):
+        return self.collideCheck(ghost)
 
-    def collide_ghost(self, ghost):
-        return self.collide_check(ghost)
-
-    def collide_check(self, other: Entity):
+    def collideCheck(self, other):
         d = self.position - other.position
-        d_squared = d.magnitude_squared()
-        r_squared = (self.collide_radius + other.collide_radius) ** 2
-        if d_squared <= r_squared:
+        dSquared = d.magnitudeSquared()
+        rSquared = (self.collideRadius + other.collideRadius)**2
+        if dSquared <= rSquared:
             return True
         return False

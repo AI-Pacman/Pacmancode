@@ -1,6 +1,5 @@
 import math
 
-
 class Vector2(object):
     def __init__(self, x=0, y=0):
         self.x = x
@@ -20,7 +19,9 @@ class Vector2(object):
         return Vector2(self.x * scalar, self.y * scalar)
 
     def __div__(self, scalar):
-        return Vector2(int(self.x / scalar), int(self.y / scalar))
+        if scalar != 0:
+            return Vector2(self.x / float(scalar), self.y / float(scalar))
+        return None
 
     def __truediv__(self, scalar):
         return self.__div__(scalar)
@@ -31,29 +32,20 @@ class Vector2(object):
                 return True
         return False
 
-    # def __lt__(self, other):
-    #     return (self.x, self.y) < (other.x, other.y)
-
-    # def __repr__(self):
-    #     return f"Vector2({self.x}, {self.y})"
-
-    # def __hash__(self):
-    #     return hash((self.x, self.y))
-
-    def magnitude_squared(self):
+    def magnitudeSquared(self):
         return self.x**2 + self.y**2
 
     def magnitude(self):
-        return math.sqrt(self.magnitude_squared())
+        return math.sqrt(self.magnitudeSquared())
 
     def copy(self):
         return Vector2(self.x, self.y)
 
-    def as_tuple(self):
+    def asTuple(self):
         return self.x, self.y
 
-    def as_int(self):
+    def asInt(self):
         return int(self.x), int(self.y)
 
     def __str__(self):
-        return "<" + str(self.x) + ", " + str(self.y) + ">"
+        return "<"+str(self.x)+", "+str(self.y)+">"
