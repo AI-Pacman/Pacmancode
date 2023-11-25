@@ -20,9 +20,7 @@ class Vector2(object):
         return Vector2(self.x * scalar, self.y * scalar)
 
     def __div__(self, scalar):
-        if scalar != 0:
-            return Vector2(self.x / float(scalar), self.y / float(scalar))
-        return None
+        return Vector2(int(self.x / scalar), int(self.y / scalar))
 
     def __truediv__(self, scalar):
         return self.__div__(scalar)
@@ -32,29 +30,32 @@ class Vector2(object):
             if abs(self.y - other.y) < self.thresh:
                 return True
         return False
+
     # add code
     def __lt__(self, other):
         # Compare vectors based on their components
         return (self.x, self.y) < (other.x, other.y)
+
     def __repr__(self):
         return f"Vector2({self.x}, {self.y})"
-    
+
     def __hash__(self):
         return hash((self.x, self.y))
+
     # end add code
-    def magnitudeSquared(self):
+    def magnitude_squared(self):
         return self.x**2 + self.y**2
 
     def magnitude(self):
-        return math.sqrt(self.magnitudeSquared())
+        return math.sqrt(self.magnitude_squared())
 
     def copy(self):
         return Vector2(self.x, self.y)
 
-    def asTuple(self):
+    def as_tuple(self):
         return self.x, self.y
 
-    def asInt(self):
+    def as_int(self):
         return int(self.x), int(self.y)
 
     def __str__(self):
