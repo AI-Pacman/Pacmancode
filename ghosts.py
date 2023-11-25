@@ -42,11 +42,11 @@ class Ghost(Entity):
         self.goal = self.pacman.position
 
     def set_spawn_node(self, node: Node | None):
-        self.spawn_node = node
+        if type(node) is Node:
+            self.spawn_node = node
 
     def spawn(self):
-        if type(self.spawn_node) is Node:
-            self.goal = self.spawn_node.position
+        self.goal = self.spawn_node.position
 
     def start_spawn(self):
         self.mode.set_spawn_mode()

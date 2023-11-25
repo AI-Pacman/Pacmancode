@@ -10,13 +10,7 @@ from vector import Vector2
 class Node(object):
     def __init__(self, x, y):
         self.position = Vector2(x, y)
-        self.neighbors: dict[int, Node] = {
-            UP: None,
-            DOWN: None,
-            LEFT: None,
-            RIGHT: None,
-            PORTAL: None,
-        }
+        self.neighbors: dict[int, Node] = {UP: None, DOWN: None, LEFT: None, RIGHT: None, PORTAL: None}
         self.access = {
             UP: [PACMAN, BLINKY, PINKY, INKY, CLYDE, FRUIT],
             DOWN: [PACMAN, BLINKY, PINKY, INKY, CLYDE, FRUIT],

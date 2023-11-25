@@ -9,7 +9,7 @@ FONT_FAMILY = "font/PressStart2P-Regular.ttf"
 class Text(object):
     def __init__(
         self,
-        description: str,
+        text: str,
         color: tuple[int, int, int],
         x: int,
         y: int,
@@ -19,7 +19,7 @@ class Text(object):
         visible=True,
     ):
         self.id = id
-        self.description: str = description
+        self.text: str = text
         self.color: tuple[int, int, int] = color
         self.size: int = size
         self.visible = visible
@@ -35,10 +35,10 @@ class Text(object):
         self.font = pygame.font.Font(font_path, self.size)
 
     def create_label(self):
-        self.label = self.font.render(self.description, 1, self.color)
+        self.label = self.font.render(self.text, 1, self.color)
 
     def set_text(self, new_text):
-        self.description = str(new_text)
+        self.text = str(new_text)
         self.create_label()
 
     def update(self, dt):
@@ -62,69 +62,24 @@ class TextGroup(object):
         self.setup_text()
         self.show_text(READYTXT)
 
-    def setup_text(self):
-        size = TILEHEIGHT
-        self.all_text[SCORETXT] = Text(
-            "0".zfill(8),
-            WHITE,
-            0,
-            TILEHEIGHT,
-            size,
-        )
-        self.all_text[LEVELTXT] = Text(
-            str(1).zfill(3),
-            WHITE,
-            23 * TILEWIDTH,
-            TILEHEIGHT,
-            size,
-        )
-        self.all_text[READYTXT] = Text(
-            "READY!",
-            YELLOW,
-            int(11.25 * TILEWIDTH),
-            20 * TILEHEIGHT,
-            size,
-            visible=False,
-        )
-        self.all_text[PAUSETXT] = Text(
-            "PAUSED!",
-            YELLOW,
-            int(10.625 * TILEWIDTH),
-            20 * TILEHEIGHT,
-            size,
-            visible=False,
-        )
-        self.all_text[GAMEOVERTXT] = Text(
-            "GAMEOVER!",
-            YELLOW,
-            10 * TILEWIDTH,
-            20 * TILEHEIGHT,
-            size,
-            visible=False,
-        )
-        self.add_text(
-            "SCORE",
-            WHITE,
-            0,
-            0,
-            size,
-        )
-        self.add_text(
-            "LEVEL",
-            WHITE,
-            23 * TILEWIDTH,
-            0,
-            size,
-        )
-
-    def show_text(self, id):
-        self.hide_text()
-        self.all_text[id].visible = True
-
     def add_text(self, text, color, x, y, size, time=None, id=None):
         self.next_id += 1
         self.all_text[self.next_id] = Text(text, color, x, y, size, time=time, id=id)
         return self.next_id
+
+    def setup_text(self):
+        size = TILEHEIGHT
+        self.all_text[SCORETXT] = Text("0".zfill(8), WHITE, 0, TILEHEIGHT, size)
+        self.all_text[LEVELTXT] = Text(str(1).zfill(3), WHITE, 23 * TILEWIDTH, TILEHEIGHT, size)
+        self.all_text[READYTXT] = Text("READY!", YELLOW, int(11.25 * TILEWIDTH), 20 * TILEHEIGHT, size, visible=False)
+        self.all_text[PAUSETXT] = Text("PAUSED!", YELLOW, int(10.625 * TILEWIDTH), 20 * TILEHEIGHT, size, visible=False)
+        self.all_text[GAMEOVERTXT] = Text("GAMEOVER!", YELLOW, 10 * TILEWIDTH, 20 * TILEHEIGHT, size, visible=False)
+        self.add_text("SCORE", WHITE, 0, 0, size)
+        self.add_text("LEVEL", WHITE, 23 * TILEWIDTH, 0, size)
+
+    def show_text(self, id):
+        self.hide_text()
+        self.all_text[id].visible = True
 
     def remove_text(self, id):
         self.all_text.pop(id)

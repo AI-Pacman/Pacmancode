@@ -131,14 +131,7 @@ class FruitSprites(Spritesheet):
     def __init__(self, entity, level):
         super().__init__()
         self.entity = entity
-        self.fruits = {
-            0: (16, 8),
-            1: (18, 8),
-            2: (20, 8),
-            3: (16, 10),
-            4: (18, 10),
-            5: (20, 10),
-        }
+        self.fruits = {0: (16, 8), 1: (18, 8), 2: (20, 8), 3: (16, 10), 4: (18, 10), 5: (20, 10)}
         self.entity.image = self.get_start_image(level % len(self.fruits))
 
     def get_start_image(self, key):

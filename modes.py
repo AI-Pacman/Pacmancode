@@ -12,6 +12,11 @@ class MainMode(object):
         self.time = 7
         self.timer = 0
 
+    def chase(self):
+        self.mode = CHASE
+        self.time = 20
+        self.timer = 0
+
     def update(self, dt):
         self.timer += dt
         if self.timer >= self.time:
@@ -19,11 +24,6 @@ class MainMode(object):
                 self.chase()
             elif self.mode is CHASE:
                 self.scatter()
-
-    def chase(self):
-        self.mode = CHASE
-        self.time = 20
-        self.timer = 0
 
 
 class ModeController(object):

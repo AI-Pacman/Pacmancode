@@ -296,22 +296,21 @@ class GameController(object):
     #     elif ghost_button.collidepoint(pos):
     #         self.have_ghosts = not self.have_ghosts
 
-    def handle_space_key(self):
-        # Xử lý sự kiện tương tự khi nhấn phím cách (Space)
-        if self.pacman.alive:
-            self.pause.set_pause(player_paused=True)
-            if not self.pause.paused:
-                self.textgroup.hide_text()
-                self.show_entities()
-            else:
-                self.textgroup.show_text(PAUSETXT)
+    # def handle_space_key(self):
+    #     # Xử lý sự kiện tương tự khi nhấn phím cách (Space)
+    #     if self.pacman.alive:
+    #         self.pause.set_pause(player_paused=True)
+    #         if not self.pause.paused:
+    #             self.textgroup.hide_text()
+    #             self.show_entities()
+    #         else:
+    #             self.textgroup.show_text(PAUSETXT)
 
-    def change_algorithm(self):
-        current_index = ALGORITHMS.index(self.current_algorithm)
-        next_index = (current_index + 1) % len(ALGORITHMS)
-        self.current_algorithm = ALGORITHMS[next_index]
+    # def change_algorithm(self):
+    #     current_index = ALGORITHMS.index(self.current_algorithm)
+    #     next_index = (current_index + 1) % len(ALGORITHMS)
+    #     self.current_algorithm = ALGORITHMS[next_index]
 
-    # end code button
     def render(self):
         self.screen.blit(self.background, (0, 0))
         # self.nodes.render(self.screen)

@@ -6,7 +6,6 @@ from constants import *
 from nodes import Node
 from vector import Vector2
 
-SPEED = 100
 
 class Entity(object):
     def __init__(self, node):
@@ -30,7 +29,7 @@ class Entity(object):
         self.position: Vector2
         self.path: list[int] = []
         self.set_start_node(node)
-        self.set_speed(SPEED)
+        self.set_speed(100)
 
     def set_start_node(self, node: Node | None):
         if type(node) is Node:
@@ -129,7 +128,7 @@ class Entity(object):
         self.visible = True
 
     def set_speed(self, speed):
-        self.speed = speed * TILEWIDTH / 16
+        self.speed = speed * TILEWIDTH / TILEWIDTH
 
     def render(self, screen: pygame.Surface):
         if self.visible:

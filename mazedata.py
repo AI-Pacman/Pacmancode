@@ -9,12 +9,7 @@ class MazeBase(object):
         self.name: str
         self.portal_pairs: dict[int, tuple[tuple[int, int], tuple[int, int]]] = {}
         self.home_offset = (0, 0)
-        self.ghost_node_deny: dict[int, tuple[tuple[int, int], ...]] = {
-            UP: (),
-            DOWN: (),
-            LEFT: (),
-            RIGHT: (),
-        }
+        self.ghost_node_deny: dict[int, tuple[tuple[int, int], ...]] = {UP: (), DOWN: (), LEFT: (), RIGHT: ()}
         self.home_node_connect_left: tuple[int, int]
         self.home_node_connect_right: tuple[int, int]
         self.pacman_start: tuple[int, int]
