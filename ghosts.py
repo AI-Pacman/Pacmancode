@@ -14,12 +14,12 @@ class Ghost(Entity):
         self.points = 200
         self.goal = Vector2()
         self.direction_method = self.goal_direction
-        self.pacman: Pacman = pacman
         self.mode = ModeController(self)
-        self.blinky = blinky
-        self.home_node: Node = node
         self.color: tuple[int, int, int]
         self.sprites: GhostSprites
+        self.home_node: Node = node
+        self.pacman: Pacman = pacman
+        self.blinky = blinky
 
     def reset(self):
         Entity.reset(self)

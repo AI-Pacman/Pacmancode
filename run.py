@@ -6,11 +6,11 @@ from fruit import Fruit
 from ghosts import GhostGroup
 from mazedata import MazeData
 from nodes import NodeGroup
-from pacman import ALGORITHMS, Pacman
+from pacman import Pacman
 from pauser import Pause
 from pellets import PelletGroup
 from sprites import LifeSprites, MazeSprites
-from text import FONT_FAMILY, TextGroup
+from text import TextGroup
 
 
 class GameController(object):
@@ -33,8 +33,8 @@ class GameController(object):
         self.flash_timer = 0
         self.fruit_captured: list[pygame.Surface] = []
         self.mazedata = MazeData()
-        self.current_algorithm = ALGORITHMS[0]
-        self.have_ghosts = False
+        # self.current_algorithm = ALGORITHMS[0]
+        # self.have_ghosts = False
 
     def set_background(self):
         self.background_norm = pygame.surface.Surface(SCREENSIZE).convert()
@@ -53,9 +53,11 @@ class GameController(object):
             self.mazedata.maze_path + self.mazedata.obj.name + "_rotation.txt",
         )
         self.set_background()
+
         self.nodes = NodeGroup(self.mazedata.maze_path + self.mazedata.obj.name + ".txt")
         self.mazedata.obj.set_portal_pairs(self.nodes)
         self.mazedata.obj.connect_home_nodes(self.nodes)
+
         self.pacman = Pacman(self.nodes.get_node_from_tiles(*self.mazedata.obj.pacman_start))
         # self.pellets = PelletGroup(self.mazedata.maze_path + self.mazedata.obj.name + ".txt", self.nodes)
         self.pellets = PelletGroup(self.mazedata.maze_path + self.mazedata.obj.name + ".txt")

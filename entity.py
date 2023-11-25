@@ -144,14 +144,14 @@ class Entity(object):
                 adjust = Vector2(TILEWIDTH, TILEHEIGHT) / 2
                 p = self.position - adjust
                 screen.blit(self.image, p.as_tuple())
-        else:
-            # for direction in self.path:
-            #         if self.node.neighbors[direction] is not None:
-            #             line_start = self.node.position.as_tuple()
-            #             line_end = self.node.neighbors[direction].position.as_tuple()
-            #             pygame.draw.line(screen, GREEN, line_start, line_end, 4)
-            # center = self.position.as_int()
-            # pygame.draw.circle(screen, self.color, center, self.radius)
+            else:
+                # for direction in self.path:
+                #         if self.node.neighbors[direction] is not None:
+                #             line_start = self.node.position.as_tuple()
+                #             line_end = self.node.neighbors[direction].position.as_tuple()
+                #             pygame.draw.line(screen, GREEN, line_start, line_end, 4)
+                # center = self.position.as_int()
+                # pygame.draw.circle(screen, self.color, center, self.radius)
 
-            p = self.position.as_int()
-            pygame.draw.circle(screen, self.color, p, self.radius)
+                p = self.position.as_int()
+                pygame.draw.circle(screen, self.color, p, self.radius)

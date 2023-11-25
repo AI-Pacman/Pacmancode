@@ -1,7 +1,9 @@
 from collections import deque
-from queue import PriorityQueue, Queue
+from queue import PriorityQueue
 
 from constants import *
+
+ALGORITHMS = ["ALGORITHMS", "BFS", "DFS", "IDDFS", "GREEDY", "A*"]
 
 
 def depth_first_search(start_node, pellet_node):

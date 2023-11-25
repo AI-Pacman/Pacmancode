@@ -1,5 +1,4 @@
 from constants import *
-from entity import Entity
 
 
 class MainMode(object):

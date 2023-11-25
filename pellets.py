@@ -2,7 +2,6 @@ import numpy as np
 import pygame
 
 from constants import *
-from nodes import Node, NodeGroup
 from vector import Vector2
 
 

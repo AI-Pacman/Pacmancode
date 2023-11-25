@@ -1,17 +1,11 @@
 from __future__ import annotations
 
-from typing import Sequence
-
 import pygame
 from pygame.locals import K_DOWN, K_LEFT, K_RIGHT, K_UP
 
 from constants import *
 from entity import Entity
-from pellets import Pellet
-from search import *
 from sprites import PacmanSprites
-
-ALGORITHMS = ["ALGORITHMS", "BFS", "DFS", "IDDFS", "GREEDY", "A*"]
 
 
 class Pacman(Entity):
