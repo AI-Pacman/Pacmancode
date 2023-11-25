@@ -31,18 +31,15 @@ class Vector2(object):
                 return True
         return False
 
-    # add code
-    def __lt__(self, other):
-        # Compare vectors based on their components
-        return (self.x, self.y) < (other.x, other.y)
+    # def __lt__(self, other):
+    #     return (self.x, self.y) < (other.x, other.y)
 
-    def __repr__(self):
-        return f"Vector2({self.x}, {self.y})"
+    # def __repr__(self):
+    #     return f"Vector2({self.x}, {self.y})"
 
-    def __hash__(self):
-        return hash((self.x, self.y))
+    # def __hash__(self):
+    #     return hash((self.x, self.y))
 
-    # end add code
     def magnitude_squared(self):
         return self.x**2 + self.y**2
 

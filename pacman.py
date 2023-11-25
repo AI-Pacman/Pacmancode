@@ -7,12 +7,9 @@ from pygame.locals import K_DOWN, K_LEFT, K_RIGHT, K_UP
 
 from constants import *
 from entity import Entity
-from pellets import Pellet, PowerPellet
-
-# from run import ALGORITHMS
+from pellets import Pellet
 from search import *
 from sprites import PacmanSprites
-from vector import Vector2
 
 ALGORITHMS = ["ALGORITHMS", "BFS", "DFS", "IDDFS", "GREEDY", "A*"]
 
@@ -39,43 +36,33 @@ class Pacman(Entity):
         self.alive = False
         self.direction = STOP
 
-    def update(self, dt, pellets: Sequence[Pellet], current_algorithm: str):
-        # add code
-        # Use AI search to find the direction towards the nearest pellet
-        pellet_positions = [pellet.node for pellet in pellets]
-        # visited_array=set()
-        # flag=0
-        for pellet_node in pellet_positions:
-            # if flag==0:
-            #     stack = [(self.node,[])]
+    # def update(self, dt, pellets: Sequence[Pellet], current_algorithm: str):
+    def update(self, dt):
+        # pellet_positions = [pellet.node for pellet in pellets]
+        # for pellet_node in pellet_positions:
 
-            if current_algorithm == ALGORITHMS[1]:
-                path_to_pellet = breadth_first_search(self.node, pellet_node)
-            elif current_algorithm == ALGORITHMS[2]:
-                path_to_pellet = depth_first_search(self.node, pellet_node)
-            elif current_algorithm == ALGORITHMS[3]:
-                path_to_pellet = depth_first_search_iterative_deepening(self.node, pellet_node)
-            elif current_algorithm == ALGORITHMS[4]:
-                path_to_pellet = greedy_search(self.node, pellet_node)
-            elif current_algorithm == ALGORITHMS[5]:
-                path_to_pellet = a_star_search(self.node, pellet_node)
-            else:
-                path_to_pellet = breadth_first_search(self.node, pellet_node)
-                # raise ValueError(f"Invalid algorithm: {current_algorithm}")
+        #     if current_algorithm == ALGORITHMS[1]:
+        #         path_to_pellet = breadth_first_search(self.node, pellet_node)
+        #     elif current_algorithm == ALGORITHMS[2]:
+        #         path_to_pellet = depth_first_search(self.node, pellet_node)
+        #     elif current_algorithm == ALGORITHMS[3]:
+        #         path_to_pellet = depth_first_search_iterative_deepening(self.node, pellet_node)
+        #     elif current_algorithm == ALGORITHMS[4]:
+        #         path_to_pellet = greedy_search(self.node, pellet_node)
+        #     elif current_algorithm == ALGORITHMS[5]:
+        #         path_to_pellet = a_star_search(self.node, pellet_node)
+        #     else:
+        #         path_to_pellet = breadth_first_search(self.node, pellet_node)
 
-            if path_to_pellet is not None:
-                self.path = path_to_pellet
-                # print(f"Path to pellet {pellet_node}: {path_to_pellet}")
-                # Now you can use path_to_pellet to update the direction and target
-                if path_to_pellet:
-                    next_direction = path_to_pellet[0]
-                    self.direction = next_direction
-                    self.target = self.get_new_target(next_direction)
-                    # self.direction = STOP
+        #     if path_to_pellet is not None:
+        #         self.path = path_to_pellet
+        #         if path_to_pellet:
+        #             next_direction = path_to_pellet[0]
+        #             self.direction = next_direction
+        #             self.target = self.get_new_target(next_direction)
 
-            else:
-                print(f"Pellet {pellet_node} is unreachable.")
-        # end add code
+        #     else:
+        #         print(f"Pellet {pellet_node} is unreachable.")
 
         self.sprites.update(dt)
         self.position += self.directions[self.direction] * self.speed * dt

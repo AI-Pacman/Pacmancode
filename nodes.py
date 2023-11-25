@@ -40,22 +40,18 @@ class Node(object):
                 pygame.draw.line(screen, WHITE, line_start, line_end, 4)
                 pygame.draw.circle(screen, RED, self.position.as_int(), 12)
 
-    # add code to AI search
+    # def as_tuple(self):
+    #     return self.position.as_tuple()
 
-    def as_tuple(self):
-        return self.position.as_tuple()
+    # def __eq__(self, other):
+    #     return self.position == other.position
 
-    def __eq__(self, other):
-        return self.position == other.position
+    # def __hash__(self):
+    #     return hash(self.position)
 
-    def __hash__(self):
-        return hash(self.position)
-
-    def __lt__(self, other):
-        # Compare nodes based on their positions
-        return self.position < other.position
-
-    # end add code to AI search
+    # def __lt__(self, other):
+    #     # Compare nodes based on their positions
+    #     return self.position < other.position
 
 
 class NodeGroup(object):
@@ -63,13 +59,11 @@ class NodeGroup(object):
         self.level = level
         self.nodes_lookup_table: dict[tuple[int, int], Node] = {}
 
-        # Add more pellets to nodes_lookup_table
-        # self.node_symbols = ["+", "P", "n"]
-        # self.path_symbols = [".", "-", "|", "p"]
-        self.node_symbols = ["+", "P", "n", ".", "p"]
+        self.node_symbols = ["+", "P", "n"]
         self.path_symbols = [".", "-", "|", "p"]
 
-        # end add code
+        # self.node_symbols = ["+", "P", "n", ".", "p"]
+        # self.path_symbols = [".", "-", "|", "p"]
 
         data = self.read_maze_file(level)
         self.create_node_table(data)

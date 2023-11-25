@@ -7,7 +7,8 @@ from vector import Vector2
 
 
 class Pellet(object):
-    def __init__(self, row: int, column: int, node=None):
+    # def __init__(self, row: int, column: int, node=None):
+    def __init__(self, row: int, column: int):
         self.name = PELLET
         self.position = Vector2(column * TILEWIDTH, row * TILEHEIGHT)
         self.color = WHITE
@@ -15,10 +16,7 @@ class Pellet(object):
         self.collide_radius = 2 * TILEWIDTH / 16
         self.points = 10
         self.visible = True
-        # add code
-        # node của pellet
-        self.node: Node | None = node
-        # end add code
+        # self.node: Node | None = node
 
     def render(self, screen):
         if self.visible:
@@ -28,8 +26,10 @@ class Pellet(object):
 
 
 class PowerPellet(Pellet):
-    def __init__(self, row: int, column: int, node=None):
-        super().__init__(row, column, node)
+    # def __init__(self, row: int, column: int, node=None):
+    def __init__(self, row: int, column: int):
+        # super().__init__(row, column, node)
+        super().__init__(row, column)
         self.name = POWERPELLET
         self.radius = int(8 * TILEWIDTH / 16)
         self.points = 50
@@ -44,31 +44,31 @@ class PowerPellet(Pellet):
 
 
 class PelletGroup(object):
-    def __init__(self, pellet_file, node_group: NodeGroup):
+    # def __init__(self, pellet_file, node_group: NodeGroup):
+    def __init__(self, pellet_file):
         self.pellet_list: list[Pellet] = []
         self.power_pellets: list[PowerPellet] = []
-        self.create_pellet_list(pellet_file, node_group)
+        # self.create_pellet_list(pellet_file, node_group)
+        self.create_pellet_list(pellet_file)
         self.num_eaten = 0
 
     def update(self, dt):
         for powerpellet in self.power_pellets:
             powerpellet.update(dt)
 
-    def create_pellet_list(self, pellet_file, node_group: NodeGroup):
+    # def create_pellet_list(self, pellet_file, node_group: NodeGroup):
+    def create_pellet_list(self, pellet_file):
         data = self.read_pellet_file(pellet_file)
         for row in range(data.shape[0]):
             for col in range(data.shape[1]):
                 if data[row][col] in [".", "+"]:
-                    pellet = Pellet(row, col, None)
-                    # add code
-                    pellet.node = node_group.get_node_from_tiles(col, row)
-                    # end code
-                    self.pellet_list.append(pellet)
+                    # pellet = Pellet(row, col, None)
+                    # pellet.node = node_group.get_node_from_tiles(col, row)
+                    # self.pellet_list.append(pellet)
+                    self.pellet_list.append(Pellet(row, col))
                 elif data[row][col] in ["P", "p"]:
                     pp = PowerPellet(row, col)
-                    # add code
-                    pp.node = node_group.get_node_from_tiles(col, row)
-                    # end code
+                    # pp.node = node_group.get_node_from_tiles(col, row)
                     self.pellet_list.append(pp)
                     self.power_pellets.append(pp)
 
