@@ -1,16 +1,15 @@
 from random import randint
 
 import pygame
-from pygame.locals import *
 
 from constants import *
+from nodes import Node
 from vector import Vector2
-
 
 
 class Entity(object):
     def __init__(self, node):
-        self.name = None
+        self.name: int
         self.directions = {
             UP: Vector2(0, -1),
             DOWN: Vector2(0, 1),
@@ -19,152 +18,140 @@ class Entity(object):
             STOP: Vector2(),
         }
         self.direction = STOP
-        self.setSpeed(300)
         self.radius = 10
-        self.collideRadius = 5
+        self.collide_radius = 5
         self.color = WHITE
         self.visible = True
-        self.disablePortal = False
-        self.goal = None
-        self.directionMethod = self.randomDirection
-        self.setStartNode(node)
-        self.image = None
+        self.disable_portal = False
+        self.goal: Vector2
+        self.direction_method = self.random_direction
+        self.image: pygame.Surface
+        self.position: Vector2
+        self.path: list[int] = []
+        self.set_start_node(node)
+        self.set_speed(100)
 
-    def setPosition(self):
+    def set_start_node(self, node: Node | None):
+        if type(node) is Node:
+            self.node = node
+            self.start_node = node
+            self.target = node
+            self.set_position()
+
+    def set_position(self):
         self.position = self.node.position.copy()
 
     def update(self, dt):
         self.position += self.directions[self.direction] * self.speed * dt
 
-        if self.overshotTarget():
+        if self.overshot_target():
             self.node = self.target
-            directions = self.validDirections()
-            direction = self.directionMethod(directions)
-            if not self.disablePortal:
+            directions = self.valid_directions()
+            direction = self.direction_method(directions)
+            if not self.disable_portal:
                 if self.node.neighbors[PORTAL] is not None:
                     self.node = self.node.neighbors[PORTAL]
-            self.target = self.getNewTarget(direction)
+            self.target = self.get_new_target(direction)
             if self.target is not self.node:
                 self.direction = direction
             else:
-                self.target = self.getNewTarget(self.direction)
+                self.target = self.get_new_target(self.direction)
 
-            self.setPosition()
+            self.set_position()
 
-    def validDirection(self, direction):
-        # add code to fix bug
-        try:
-            if direction is not STOP:
-                if self.name in self.node.access[direction]:
-                    if self.node.neighbors[direction] is not None:
-                        return True
-        except KeyError:
-            
-            # Handle the KeyError here, for example, print a message
-            print(f"KeyError: Direction {direction} not found in node.access")
-            return False
+    def valid_direction(self, direction):
+        # try:
+        if direction is not STOP:
+            if self.name in self.node.access[direction]:
+                if self.node.neighbors[direction] is not None:
+                    return True
         return False
-        # end add code
-    
-    def getNewTarget(self, direction):
-        if self.validDirection(direction):
+
+    # except KeyError:
+    #     print(f"KeyError: Direction {direction} not found in node.access")
+    #     return False
+
+    def get_new_target(self, direction):
+        if self.valid_direction(direction):
             return self.node.neighbors[direction]
         return self.node
 
-    def overshotTarget(self):
+    def overshot_target(self):
         if self.target is not None:
             vec1 = self.target.position - self.node.position
             vec2 = self.position - self.node.position
-            node2Target = vec1.magnitudeSquared()
-            node2Self = vec2.magnitudeSquared()
-            return node2Self >= node2Target
+            node_to_target = vec1.magnitude_squared()
+            node_to_self = vec2.magnitude_squared()
+            return node_to_self >= node_to_target
         return False
 
-    def reverseDirection(self):
+    def reverse_direction(self):
         self.direction *= -1
         temp = self.node
         self.node = self.target
         self.target = temp
 
-    def oppositeDirection(self, direction):
-        if direction is not STOP:
-            if direction == self.direction * -1:
-                return True
+    def opposite_direction(self, direction):
+        if direction is not STOP and direction == self.direction * -1:
+            return True
         return False
 
-    def validDirections(self):
+    def valid_directions(self):
         directions = []
         for key in [UP, DOWN, LEFT, RIGHT]:
-            if self.validDirection(key):
-                if key != self.direction * -1:
-                    directions.append(key)
+            if self.valid_direction(key) and key != self.direction * -1:
+                directions.append(key)
         if len(directions) == 0:
             directions.append(self.direction * -1)
         return directions
 
-    def randomDirection(self, directions):
+    def random_direction(self, directions):
         return directions[randint(0, len(directions) - 1)]
 
-    def goalDirection(self, directions):
+    def goal_direction(self, directions):
         distances = []
         for direction in directions:
-            vec = (
-                self.node.position + self.directions[direction] * TILEWIDTH - self.goal
-            )
-            distances.append(vec.magnitudeSquared())
+            vec = self.node.position + self.directions[direction] * TILEWIDTH - self.goal
+            distances.append(vec.magnitude_squared())
         index = distances.index(min(distances))
         return directions[index]
 
-    def setStartNode(self, node):
-        self.node = node
-        self.startNode = node
-        self.target = node
-        self.setPosition()
-
-    def setBetweenNodes(self, direction):
+    def set_between_nodes(self, direction):
         if self.node.neighbors[direction] is not None:
             self.target = self.node.neighbors[direction]
             self.position = (self.node.position + self.target.position) / 2.0
 
     def reset(self):
-        self.setStartNode(self.startNode)
+        self.set_start_node(self.start_node)
         self.direction = STOP
         self.speed = 100
         self.visible = True
 
-    def setSpeed(self, speed):
-        self.speed = speed * TILEWIDTH / 16
+    def set_speed(self, speed):
+        self.speed = speed * TILEWIDTH / TILEWIDTH
 
-    def render(self, screen):
+    def render(self, screen: pygame.Surface):
         if self.visible:
             if self.image is not None:
-                # Add code 
-                # Draw the path in green
-                for direction in self.path:
-                    if self.node.neighbors[direction] is not None:
-                        line_start = self.node.position.asTuple()
-                        line_end = self.node.neighbors[direction].position.asTuple()
-                        pygame.draw.line(screen, GREEN, line_start, line_end, 4)
-                p = self.position.asInt()
-                    
-                   
-                pygame.draw.circle(screen, self.color, p, self.radius)
-                # end add code
+                # for direction in self.path:
+                #     if self.node.neighbors[direction] is not None:
+                #         line_start = self.node.position.as_tuple()
+                #         line_end = self.node.neighbors[direction].position.as_tuple()
+                #         pygame.draw.line(screen, GREEN, line_start, line_end, 4)
+                # center = self.position.as_int()
+                # pygame.draw.circle(screen, self.color, center, self.radius)
+
                 adjust = Vector2(TILEWIDTH, TILEHEIGHT) / 2
                 p = self.position - adjust
-                screen.blit(self.image, p.asTuple())
+                screen.blit(self.image, p.as_tuple())
             else:
-                # Add code 
-                # Draw the path in green
-                for direction in self.path:
-                    if self.node.neighbors[direction] is not None:
-                        line_start = self.node.position.asTuple()
-                        line_end = self.node.neighbors[direction].position.asTuple()
-                        pygame.draw.line(screen, GREEN, line_start, line_end, 4)
-                p = self.position.asInt()
-                    
-                    
-                pygame.draw.circle(screen, self.color, p, self.radius)
-                # end add code
-                p = self.position.asInt()
+                # for direction in self.path:
+                #         if self.node.neighbors[direction] is not None:
+                #             line_start = self.node.position.as_tuple()
+                #             line_end = self.node.neighbors[direction].position.as_tuple()
+                #             pygame.draw.line(screen, GREEN, line_start, line_end, 4)
+                # center = self.position.as_int()
+                # pygame.draw.circle(screen, self.color, center, self.radius)
+
+                p = self.position.as_int()
                 pygame.draw.circle(screen, self.color, p, self.radius)

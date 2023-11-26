@@ -4,8 +4,8 @@ import pygame
 from animation import Animator
 from constants import *
 
-BASETILEWIDTH = 16
-BASETILEHEIGHT = 16
+BASE_TILEWIDTH = 16
+BASE_TILEHEIGHT = 16
 DEATH = 5
 
 FILEPATH = "spritesheets/"
@@ -17,11 +17,11 @@ class Spritesheet(object):
         self.sheet = pygame.image.load(FILEPATH + FILENAME).convert()
         transcolor = self.sheet.get_at((0, 0))
         self.sheet.set_colorkey(transcolor)
-        width = int(self.sheet.get_width() / BASETILEWIDTH * TILEWIDTH)
-        height = int(self.sheet.get_height() / BASETILEHEIGHT * TILEHEIGHT)
+        width = int(self.sheet.get_width() / BASE_TILEWIDTH * TILEWIDTH)
+        height = int(self.sheet.get_height() / BASE_TILEHEIGHT * TILEHEIGHT)
         self.sheet = pygame.transform.scale(self.sheet, (width, height))
 
-    def getImage(self, x, y, width, height):
+    def get_image(self, x, y, width, height):
         x *= TILEWIDTH
         y *= TILEHEIGHT
         self.sheet.set_clip(pygame.Rect(x, y, width, height))
@@ -30,14 +30,14 @@ class Spritesheet(object):
 
 class PacmanSprites(Spritesheet):
     def __init__(self, entity):
-        Spritesheet.__init__(self)
+        super().__init__()
         self.entity = entity
-        self.entity.image = self.getStartImage()
+        self.entity.image = self.get_start_image()
         self.animations = {}
-        self.defineAnimations()
-        self.stopimage = (8, 0)
+        self.define_animations()
+        self.stop_image = (8, 0)
 
-    def defineAnimations(self):
+    def define_animations(self):
         self.animations[LEFT] = Animator(((8, 0), (0, 0), (0, 2), (0, 0)))
         self.animations[RIGHT] = Animator(((10, 0), (2, 0), (2, 2), (2, 0)))
         self.animations[UP] = Animator(((10, 2), (6, 0), (6, 2), (6, 0)))
@@ -63,134 +63,126 @@ class PacmanSprites(Spritesheet):
     def update(self, dt):
         if self.entity.alive == True:
             if self.entity.direction == LEFT:
-                self.entity.image = self.getImage(*self.animations[LEFT].update(dt))
-                self.stopimage = (8, 0)
+                self.entity.image = self.get_image(*self.animations[LEFT].update(dt))
+                self.stop_image = (8, 0)
             elif self.entity.direction == RIGHT:
-                self.entity.image = self.getImage(*self.animations[RIGHT].update(dt))
-                self.stopimage = (10, 0)
+                self.entity.image = self.get_image(*self.animations[RIGHT].update(dt))
+                self.stop_image = (10, 0)
             elif self.entity.direction == DOWN:
-                self.entity.image = self.getImage(*self.animations[DOWN].update(dt))
-                self.stopimage = (8, 2)
+                self.entity.image = self.get_image(*self.animations[DOWN].update(dt))
+                self.stop_image = (8, 2)
             elif self.entity.direction == UP:
-                self.entity.image = self.getImage(*self.animations[UP].update(dt))
-                self.stopimage = (10, 2)
+                self.entity.image = self.get_image(*self.animations[UP].update(dt))
+                self.stop_image = (10, 2)
             elif self.entity.direction == STOP:
-                self.entity.image = self.getImage(*self.stopimage)
+                self.entity.image = self.get_image(*self.stop_image)
         else:
-            self.entity.image = self.getImage(*self.animations[DEATH].update(dt))
+            self.entity.image = self.get_image(*self.animations[DEATH].update(dt))
 
     def reset(self):
         for key in list(self.animations.keys()):
             self.animations[key].reset()
 
-    def getStartImage(self):
-        return self.getImage(8, 0)
+    def get_start_image(self):
+        return self.get_image(8, 0)
 
-    def getImage(self, x, y):
-        return Spritesheet.getImage(self, x, y, 2 * TILEWIDTH, 2 * TILEHEIGHT)
+    def get_image(self, x, y):
+        return Spritesheet.get_image(self, x, y, 2 * TILEWIDTH, 2 * TILEHEIGHT)
 
 
 class GhostSprites(Spritesheet):
     def __init__(self, entity):
-        Spritesheet.__init__(self)
+        super().__init__()
         self.x = {BLINKY: 0, PINKY: 2, INKY: 4, CLYDE: 6}
         self.entity = entity
-        self.entity.image = self.getStartImage()
+        self.entity.image = self.get_start_image()
 
     def update(self, dt):
         x = self.x[self.entity.name]
         if self.entity.mode.current in [SCATTER, CHASE]:
             if self.entity.direction == LEFT:
-                self.entity.image = self.getImage(x, 8)
+                self.entity.image = self.get_image(x, 8)
             elif self.entity.direction == RIGHT:
-                self.entity.image = self.getImage(x, 10)
+                self.entity.image = self.get_image(x, 10)
             elif self.entity.direction == DOWN:
-                self.entity.image = self.getImage(x, 6)
+                self.entity.image = self.get_image(x, 6)
             elif self.entity.direction == UP:
-                self.entity.image = self.getImage(x, 4)
+                self.entity.image = self.get_image(x, 4)
         elif self.entity.mode.current == FREIGHT:
-            self.entity.image = self.getImage(10, 4)
+            self.entity.image = self.get_image(10, 4)
         elif self.entity.mode.current == SPAWN:
             if self.entity.direction == LEFT:
-                self.entity.image = self.getImage(8, 8)
+                self.entity.image = self.get_image(8, 8)
             elif self.entity.direction == RIGHT:
-                self.entity.image = self.getImage(8, 10)
+                self.entity.image = self.get_image(8, 10)
             elif self.entity.direction == DOWN:
-                self.entity.image = self.getImage(8, 6)
+                self.entity.image = self.get_image(8, 6)
             elif self.entity.direction == UP:
-                self.entity.image = self.getImage(8, 4)
+                self.entity.image = self.get_image(8, 4)
 
-    def getStartImage(self):
-        return self.getImage(self.x[self.entity.name], 4)
+    def get_start_image(self):
+        return self.get_image(self.x[self.entity.name], 4)
 
-    def getImage(self, x, y):
-        return Spritesheet.getImage(self, x, y, 2 * TILEWIDTH, 2 * TILEHEIGHT)
+    def get_image(self, x, y):
+        return Spritesheet.get_image(self, x, y, 2 * TILEWIDTH, 2 * TILEHEIGHT)
 
 
 class FruitSprites(Spritesheet):
     def __init__(self, entity, level):
-        Spritesheet.__init__(self)
+        super().__init__()
         self.entity = entity
-        self.fruits = {
-            0: (16, 8),
-            1: (18, 8),
-            2: (20, 8),
-            3: (16, 10),
-            4: (18, 10),
-            5: (20, 10),
-        }
-        self.entity.image = self.getStartImage(level % len(self.fruits))
+        self.fruits = {0: (16, 8), 1: (18, 8), 2: (20, 8), 3: (16, 10), 4: (18, 10), 5: (20, 10)}
+        self.entity.image = self.get_start_image(level % len(self.fruits))
 
-    def getStartImage(self, key):
-        return self.getImage(*self.fruits[key])
+    def get_start_image(self, key):
+        return self.get_image(*self.fruits[key])
 
-    def getImage(self, x, y):
-        return Spritesheet.getImage(self, x, y, 2 * TILEWIDTH, 2 * TILEHEIGHT)
+    def get_image(self, x, y):
+        return Spritesheet.get_image(self, x, y, 2 * TILEWIDTH, 2 * TILEHEIGHT)
 
 
 class LifeSprites(Spritesheet):
-    def __init__(self, numlives):
-        Spritesheet.__init__(self)
-        self.resetLives(numlives)
+    def __init__(self, num_lives):
+        super().__init__()
+        self.reset_lives(num_lives)
 
-    def removeImage(self):
+    def remove_image(self):
         if len(self.images) > 0:
             self.images.pop(0)
 
-    def resetLives(self, numlives):
+    def reset_lives(self, num_lives):
         self.images = []
-        for i in range(numlives):
-            self.images.append(self.getImage(0, 0))
+        for _ in range(num_lives):
+            self.images.append(self.get_image(0, 0))
 
-    def getImage(self, x, y):
-        return Spritesheet.getImage(self, x, y, 2 * TILEWIDTH, 2 * TILEHEIGHT)
+    def get_image(self, x, y):
+        return Spritesheet.get_image(self, x, y, 2 * TILEWIDTH, 2 * TILEHEIGHT)
 
 
 class MazeSprites(Spritesheet):
-    def __init__(self, mazefile, rotfile):
-        Spritesheet.__init__(self)
-        self.data = self.readMazeFile(mazefile)
-        self.rotdata = self.readMazeFile(rotfile)
+    def __init__(self, maze_file, rotation_file):
+        super().__init__()
+        self.data = self.read_maze_file(maze_file)
+        self.rotation_data = self.read_maze_file(rotation_file)
 
-    def getImage(self, x, y):
-        return Spritesheet.getImage(self, x, y, TILEWIDTH, TILEHEIGHT)
+    def get_image(self, x, y):
+        return Spritesheet.get_image(self, x, y, TILEWIDTH, TILEHEIGHT)
 
-    def readMazeFile(self, mazefile):
-        return np.loadtxt(mazefile, dtype="<U1")
+    def read_maze_file(self, maze_file):
+        return np.loadtxt(maze_file, dtype="<U1")
 
-    def constructBackground(self, background, y):
+    def construct_background(self, background, y):
         for row in list(range(self.data.shape[0])):
             for col in list(range(self.data.shape[1])):
                 if self.data[row][col].isdigit():
                     x = int(self.data[row][col]) + 12
-                    sprite = self.getImage(x, y)
-                    rotval = int(self.rotdata[row][col])
-                    sprite = self.rotate(sprite, rotval)
+                    sprite = self.get_image(x, y)
+                    rotation_value = int(self.rotation_data[row][col])
+                    sprite = self.rotate(sprite, rotation_value)
                     background.blit(sprite, (col * TILEWIDTH, row * TILEHEIGHT))
                 elif self.data[row][col] == "=":
-                    sprite = self.getImage(10, 8)
+                    sprite = self.get_image(10, 8)
                     background.blit(sprite, (col * TILEWIDTH, row * TILEHEIGHT))
-
         return background
 
     def rotate(self, sprite, value):
