@@ -54,6 +54,7 @@ class NodeGroup(object):
         # thêm các pellets vào nodeLUT
         # self.nodeSymbols = ["+", "P", "n"]
         # self.pathSymbols = [".", "-", "|", "p"]
+         
         self.nodeSymbols = ['+', 'P', 'n','.', 'p']
         self.pathSymbols = [ '.','-', '|', 'p']
         

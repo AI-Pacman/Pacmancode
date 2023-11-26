@@ -11,7 +11,7 @@ from pauser import Pause
 from pellets import PelletGroup
 from sprites import LifeSprites, MazeSprites
 from text import TextGroup
-
+from AIpacmanSearch import *
 
 class GameController(object):
     def __init__(self):
@@ -36,6 +36,8 @@ class GameController(object):
         self.mazedata = MazeData()
         self.current_algorithm = "Alogorithms"  
         self.haveghosts = False
+        self.path_pacman =  []
+        self.nodes_path_pacman = []
        
 
     def setBackground(self):
@@ -105,9 +107,43 @@ class GameController(object):
 
         if self.pacman.alive:
             if not self.pause.paused:
-                self.pacman.update(dt,self.pellets.pelletList, self.current_algorithm) # add pellet code 
+                print(self.path_pacman)
+                print(self.nodes_path_pacman)
+                if self.path_pacman:  
+                    self.pacman.direction = self.path_pacman[0]
+                    self.pacman.update(dt) # add pellet code 
+                    print(self.pacman.node)
+                    print(self.nodes_path_pacman[0])
+                    if self.pacman.node == self.nodes_path_pacman[0]:
+                        self.path_pacman.pop(0)
+                        self.nodes_path_pacman.pop(0)
+                if not self.path_pacman:
+                    if self.current_algorithm == "DFS":
+                       
+                        self.path_pacman, self.nodes_path_pacman = DFS(self.pacman.node, self.pellets.pelletList)                   
+                    elif self.current_algorithm == "DFS_D":
+                       
+                        self.path_pacman, self.nodes_path_pacman = depth_first_search_D(self.pacman.node, self.pellets.pelletList, 9)
+                    elif self.current_algorithm == "ID_DFS":
+                       
+                        self.path_pacman, self.nodes_path_pacman = dfs_with_iterative_deepening(self.pacman.node, self.pellets.pelletList)
+                    elif self.current_algorithm == "BFS":
+                       
+                        self.path_pacman, self.nodes_path_pacman = breadth_first_search(self.pacman.node, self.pellets.pelletList)
+                    elif self.current_algorithm == "Greedy":
+                       
+                        self.path_pacman, self.nodes_path_pacman = greedy_search(self.pacman.node, self.pellets.pelletList)
+                    elif self.current_algorithm == "A_STAR":
+                       
+                        self.path_pacman, self.nodes_path_pacman = A_star_search(self.pacman.node, self.pellets.pelletList)
+                    else:
+                       
+                        self.pacman.update(dt)
+                        # self.path_pacman, self.nodes_path_pacman = DFS(self.pacman.node, self.pellets.pelletList)
+                
         else:
             self.pacman.update(dt,self.pellets.powerpellets, self.current_algorithm)  # add pellet code
+            self.pacman.direction = STOP
 
         if self.flashBG:
             self.flashTimer += dt
@@ -325,16 +361,36 @@ class GameController(object):
     def change_algorithm(self):
         if self.current_algorithm == "Alogorithms":
             self.current_algorithm = "DFS" 
+            self.path_pacman.clear()
+            self.nodes_path_pacman.clear()
         elif self.current_algorithm == "DFS":
             self.current_algorithm = "DFS_D"
+            self.path_pacman.clear()
+            self.nodes_path_pacman.clear()
         elif self.current_algorithm == "DFS_D":
             self.current_algorithm = "ID_DFS"
+            self.path_pacman.clear()
+            self.nodes_path_pacman.clear()
         elif self.current_algorithm == "ID_DFS":
             self.current_algorithm = "BFS"
+            self.path_pacman.clear()
+            self.nodes_path_pacman.clear()
         elif self.current_algorithm == "BFS":
             self.current_algorithm = "Greedy"
+            self.path_pacman.clear()
+            self.nodes_path_pacman.clear()
         elif self.current_algorithm == "Greedy":
+            self.current_algorithm = "A_STAR"
+            self.path_pacman.clear()
+            self.nodes_path_pacman.clear()
+        elif self.current_algorithm == "A_STAR":
+            self.current_algorithm = "Alogorithms"
+            self.path_pacman.clear()
+            self.nodes_path_pacman.clear()
+        elif self.current_algorithm == "Alogorithms":
             self.current_algorithm = "DFS"
+            self.path_pacman.clear()
+            self.nodes_path_pacman.clear()
         else:
             # Default to DFS if the current algorithm is not recognized
             self.current_algorithm = "DFS"
@@ -343,7 +399,9 @@ class GameController(object):
     # end code button            
     def render(self):
         self.screen.blit(self.background, (0, 0))
+        # print node on maze
         # self.nodes.render(self.screen)
+        #end print
         self.pellets.render(self.screen)
         if self.fruit is not None:
             self.fruit.render(self.screen)
