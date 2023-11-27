@@ -6,6 +6,8 @@ from constants import *
 from nodes import Node
 from vector import Vector2
 
+SPEED_MULTIPLIER = 2
+
 
 class Entity(object):
     def __init__(self, node):
@@ -60,16 +62,10 @@ class Entity(object):
             self.set_position()
 
     def valid_direction(self, direction):
-        # try:
-        if direction is not STOP:
-            if self.name in self.node.access[direction]:
-                if self.node.neighbors[direction] is not None:
-                    return True
+        if direction is not STOP and self.name in self.node.access[direction]:
+            if self.node.neighbors[direction] is not None:
+                return True
         return False
-
-    # except KeyError:
-    #     print(f"KeyError: Direction {direction} not found in node.access")
-    #     return False
 
     def get_new_target(self, direction):
         if self.valid_direction(direction):
@@ -87,9 +83,7 @@ class Entity(object):
 
     def reverse_direction(self):
         self.direction *= -1
-        temp = self.node
-        self.node = self.target
-        self.target = temp
+        (self.node, self.target) = (self.target, self.node)
 
     def opposite_direction(self, direction):
         if direction is not STOP and direction == self.direction * -1:
@@ -124,34 +118,18 @@ class Entity(object):
     def reset(self):
         self.set_start_node(self.start_node)
         self.direction = STOP
-        self.speed = 100
+        self.speed = 100 * SPEED_MULTIPLIER
         self.visible = True
 
     def set_speed(self, speed):
-        self.speed = speed * TILEWIDTH / TILEWIDTH
+        self.speed = speed * TILEWIDTH / TILEWIDTH * SPEED_MULTIPLIER
 
     def render(self, screen: pygame.Surface):
         if self.visible:
             if self.image is not None:
-                # for direction in self.path:
-                #     if self.node.neighbors[direction] is not None:
-                #         line_start = self.node.position.as_tuple()
-                #         line_end = self.node.neighbors[direction].position.as_tuple()
-                #         pygame.draw.line(screen, GREEN, line_start, line_end, 4)
-                # center = self.position.as_int()
-                # pygame.draw.circle(screen, self.color, center, self.radius)
-
                 adjust = Vector2(TILEWIDTH, TILEHEIGHT) / 2
                 p = self.position - adjust
                 screen.blit(self.image, p.as_tuple())
             else:
-                # for direction in self.path:
-                #         if self.node.neighbors[direction] is not None:
-                #             line_start = self.node.position.as_tuple()
-                #             line_end = self.node.neighbors[direction].position.as_tuple()
-                #             pygame.draw.line(screen, GREEN, line_start, line_end, 4)
-                # center = self.position.as_int()
-                # pygame.draw.circle(screen, self.color, center, self.radius)
-
                 p = self.position.as_int()
                 pygame.draw.circle(screen, self.color, p, self.radius)

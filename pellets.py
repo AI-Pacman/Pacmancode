@@ -6,16 +6,14 @@ from vector import Vector2
 
 
 class Pellet(object):
-    # def __init__(self, row: int, column: int, node=None):
     def __init__(self, row: int, column: int):
         self.name = PELLET
         self.position = Vector2(column * TILEWIDTH, row * TILEHEIGHT)
         self.color = WHITE
-        self.radius = int(2 * TILEWIDTH / 16)
-        self.collide_radius = 2 * TILEWIDTH / 16
+        self.radius = int(2 * TILEWIDTH / TILEWIDTH)
+        self.collide_radius = 2 * TILEWIDTH / TILEWIDTH
         self.points = 10
         self.visible = True
-        # self.node: Node | None = node
 
     def render(self, screen):
         if self.visible:
@@ -25,12 +23,10 @@ class Pellet(object):
 
 
 class PowerPellet(Pellet):
-    # def __init__(self, row: int, column: int, node=None):
     def __init__(self, row: int, column: int):
-        # super().__init__(row, column, node)
         super().__init__(row, column)
         self.name = POWERPELLET
-        self.radius = int(8 * TILEWIDTH / 16)
+        self.radius = int(8 * TILEWIDTH / TILEWIDTH)
         self.points = 50
         self.flash_time = 0.2
         self.timer = 0

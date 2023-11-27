@@ -10,7 +10,13 @@ from vector import Vector2
 class Node(object):
     def __init__(self, x, y):
         self.position = Vector2(x, y)
-        self.neighbors: dict[int, Node] = {UP: None, DOWN: None, LEFT: None, RIGHT: None, PORTAL: None}
+        self.neighbors: dict[int, Node] = {
+            UP: None,
+            DOWN: None,
+            LEFT: None,
+            RIGHT: None,
+            PORTAL: None,
+        }
         self.access = {
             UP: [PACMAN, BLINKY, PINKY, INKY, CLYDE, FRUIT],
             DOWN: [PACMAN, BLINKY, PINKY, INKY, CLYDE, FRUIT],
@@ -34,19 +40,6 @@ class Node(object):
                 pygame.draw.line(screen, WHITE, line_start, line_end, 4)
                 pygame.draw.circle(screen, RED, self.position.as_int(), 12)
 
-    # def as_tuple(self):
-    #     return self.position.as_tuple()
-
-    # def __eq__(self, other):
-    #     return self.position == other.position
-
-    # def __hash__(self):
-    #     return hash(self.position)
-
-    # def __lt__(self, other):
-    #     # Compare nodes based on their positions
-    #     return self.position < other.position
-
 
 class NodeGroup(object):
     def __init__(self, level):
@@ -55,9 +48,6 @@ class NodeGroup(object):
 
         self.node_symbols = ["+", "P", "n"]
         self.path_symbols = [".", "-", "|", "p"]
-
-        # self.node_symbols = ["+", "P", "n", ".", "p"]
-        # self.path_symbols = [".", "-", "|", "p"]
 
         data = self.read_maze_file(level)
         self.create_node_table(data)
@@ -87,8 +77,12 @@ class NodeGroup(object):
                         key = self.construct_key(col + x_offset, row + y_offset)
                     else:
                         other_key = self.construct_key(col + x_offset, row + y_offset)
-                        self.nodes_lookup_table[key].neighbors[RIGHT] = self.nodes_lookup_table[other_key]
-                        self.nodes_lookup_table[other_key].neighbors[LEFT] = self.nodes_lookup_table[key]
+                        self.nodes_lookup_table[key].neighbors[RIGHT] = self.nodes_lookup_table[
+                            other_key
+                        ]
+                        self.nodes_lookup_table[other_key].neighbors[
+                            LEFT
+                        ] = self.nodes_lookup_table[key]
                         key = other_key
                 elif data[row][col] not in self.path_symbols:
                     key = None
@@ -103,8 +97,12 @@ class NodeGroup(object):
                         key = self.construct_key(col + x_offset, row + y_offset)
                     else:
                         other_key = self.construct_key(col + x_offset, row + y_offset)
-                        self.nodes_lookup_table[key].neighbors[DOWN] = self.nodes_lookup_table[other_key]
-                        self.nodes_lookup_table[other_key].neighbors[UP] = self.nodes_lookup_table[key]
+                        self.nodes_lookup_table[key].neighbors[DOWN] = self.nodes_lookup_table[
+                            other_key
+                        ]
+                        self.nodes_lookup_table[other_key].neighbors[UP] = self.nodes_lookup_table[
+                            key
+                        ]
                         key = other_key
                 elif data_transposed[col][row] not in self.path_symbols:
                     key = None
@@ -137,7 +135,9 @@ class NodeGroup(object):
         self.home_key = self.construct_key(x_offset + 2, y_offset)
         return self.home_key
 
-    def connect_home_nodes(self, home_key: tuple[int, int], other_key: tuple[int, int], direction: int):
+    def connect_home_nodes(
+        self, home_key: tuple[int, int], other_key: tuple[int, int], direction: int
+    ):
         key = self.construct_key(*other_key)
         self.nodes_lookup_table[home_key].neighbors[direction] = self.nodes_lookup_table[key]
         self.nodes_lookup_table[key].neighbors[direction * -1] = self.nodes_lookup_table[home_key]
